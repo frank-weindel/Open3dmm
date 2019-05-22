@@ -24,39 +24,5 @@ namespace Open3dmm.Classes
             rect = default;
             return false;
         }
-
-        Texture2D tex;
-        private Color[] colorBuf;
-        int paletteVersion;
-        public Texture2D GetTexture(GraphicsDevice graphicsDevice)
-        {
-            if (GetRect(out var rc))
-            {
-                if (tex == null || tex.Width != rc.X2 || tex.Height != rc.Y2 || paletteVersion != APP.PaletteVersion)
-                {
-                    tex?.Dispose();
-                    tex = null;
-                    paletteVersion = APP.PaletteVersion;
-                    unsafe
-                    {
-                        rc.TopLeftOrigin();
-                        tex = new Texture2D(graphicsDevice, rc.X2, rc.Y2, true, SurfaceFormat.ColorSRgb);
-                        var buf = new byte[rc.X2 * rc.Y2];
-                        colorBuf = new Color[rc.X2 * rc.Y2];
-                        fixed (byte* b = buf)
-                        {
-                            Blit(new IntPtr(b), rc.X2, rc.Y2, 0, 0, &rc, null);
-                            for (int i = 0; i < colorBuf.Length; i++)
-                            {
-                                colorBuf[i] = APP.Palette[b[i]].ToXNA();
-                                colorBuf[i].A = byte.MaxValue;
-                            }
-                            tex.SetData(colorBuf);
-                        }
-                    }
-                }
-            }
-            return tex;
-        }
     }
 }

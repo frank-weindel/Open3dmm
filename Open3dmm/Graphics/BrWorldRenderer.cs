@@ -28,28 +28,23 @@ namespace Open3dmm.Graphics
             if (world == null)
                 return;
             var viewport = GraphicsDevice.Viewport;
-            try
-            {
-                var vp = new Rectangle(48, 100,
-                                      world.Width1,
-                                      world.Height1);
-                GraphicsDevice.Viewport = new Viewport(vp);
-                GraphicsDevice.BlendState = BlendState.Opaque;
-                GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
-                GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                SetupCamera((BrActor*)Unsafe.AsPointer(ref world.Camera));
-                SetupLights((BrActor*)Unsafe.AsPointer(ref world.World));
+            var vp = new Rectangle(48, 100,
+                                  world.Width1,
+                                  world.Height1);
+            GraphicsDevice.Viewport = new Viewport(vp);
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            SetupCamera(world.Camera.ToPointer());
+            SetupLights(world.World.ToPointer());
 
-                BasicEffect.World = Matrix.Identity;
-                BasicEffect.View = view;
-                BasicEffect.Projection = projection;
-                BasicEffect.EnableDefaultLighting();
-                BasicEffect.TextureEnabled = false;
-                RenderNode((BrActor*)Unsafe.AsPointer(ref world.World), Matrix.Identity);
-            }
-            catch
-            {
-            }
+            BasicEffect.World = Matrix.Identity;
+            BasicEffect.View = view;
+            BasicEffect.Projection = projection;
+            BasicEffect.EnableDefaultLighting();
+            BasicEffect.TextureEnabled = false;
+            RenderNode(world.World.ToPointer(), Matrix.Identity);
+
             GraphicsDevice.Viewport = viewport;
         }
 

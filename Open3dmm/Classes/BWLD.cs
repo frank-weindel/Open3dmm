@@ -9,67 +9,43 @@ namespace Open3dmm.Classes
     {
         private BrWorldRenderer renderer;
 
-        public ref int Width1 => ref GetField<int>(0x10);
+        public Pointer<int> Width1 => GetField<int>(0x10);
 
-        public ref int Height1 => ref GetField<int>(0x14);
+        public Pointer<int> Height1 => GetField<int>(0x14);
 
-        public ref int Width2 => ref GetField<int>(0x20);
+        public Pointer<int> Width2 => GetField<int>(0x20);
 
-        public ref int Height2 => ref GetField<int>(0x24);
+        public Pointer<int> Height2 => GetField<int>(0x24);
 
-        public ref IntPtr RenderHandlers => ref GetField<IntPtr>(0x30);
+        public Pointer<IntPtr> RenderHandlers => GetField<IntPtr>(0x30);
 
-        public BWLD Field003C {
-            get => GetReference<BWLD>(0x003C);
-            set => SetReference(value, 0x003C);
-        }
+        public Ref<BWLD> Field003C => GetReference<BWLD>(0x003C);
 
-        public GPT Bitmap1 {
-            get => GetReference<GPT>(0x0100);
-            set => SetReference(value, 0x0100);
-        }
+        public Ref<GPT> Bitmap1 => GetReference<GPT>(0x0100);
 
-        public GPT Bitmap2 {
-            get => GetReference<GPT>(0x0104);
-            set => SetReference(value, 0x0104);
-        }
+        public Ref<GPT> Bitmap2 => GetReference<GPT>(0x0104);
 
-        public ref int Color => ref GetField<int>(0x10C);
+        public Pointer<int> Color => GetField<int>(0x10C);
 
-        public ZBMP Field0130 {
-            get => GetReference<ZBMP>(0x0130);
-            set => SetReference(value, 0x0130);
-        }
+        public Ref<ZBMP> Field0130 => GetReference<ZBMP>(0x0130);
 
-        public ZBMP Field0134 {
-            get => GetReference<ZBMP>(0x0134);
-            set => SetReference(value, 0x0134);
-        }
+        public Ref<ZBMP> Field0134 => GetReference<ZBMP>(0x0134);
 
-        public ref int Depth => ref GetField<int>(0x138);
+        public Pointer<int> Depth => GetField<int>(0x138);
 
-        public REGN Field015C {
-            get => GetReference<REGN>(0x015C);
-            set => SetReference(value, 0x015C);
-        }
+        public Ref<REGN> Field015C => GetReference<REGN>(0x015C);
 
-        public REGN Field0160 {
-            get => GetReference<REGN>(0x0160);
-            set => SetReference(value, 0x0160);
-        }
+        public Ref<REGN> Field0160 => GetReference<REGN>(0x0160);
 
-        public ref bool DirtyFlag => ref GetField<bool>(0x16C);
-        public ref bool SkipHandlers => ref GetField<bool>(0x170);
+        public Pointer<bool> DirtyFlag => GetField<bool>(0x16C);
+        public Pointer<bool> SkipHandlers => GetField<bool>(0x170);
 
-        public CRF Field0184 {
-            get => GetReference<CRF>(0x0184);
-            set => SetReference(value, 0x0184);
-        }
+        public Ref<CRF> Field0184 => GetReference<CRF>(0x0184);
 
-        public ref BrActor World => ref GetField<BrActor>(0x28);
-        public ref BrActor Camera => ref GetField<BrActor>(0x84);
-        public ref BrPixelMap PixelMap1 => ref GetField<BrPixelMap>(0x84);
-        public ref BrMatrix34 Matrix => ref GetField<BrMatrix34>(0x50);
+        public Pointer<BrActor> World => GetField<BrActor>(0x28);
+        public Pointer<BrActor> Camera => GetField<BrActor>(0x84);
+        public Pointer<BrPixelMap> PixelMap1 => GetField<BrPixelMap>(0x84);
+        public Pointer<BrMatrix34> Matrix => GetField<BrMatrix34>(0x50);
 
         protected override void Initialize()
         {
@@ -78,21 +54,12 @@ namespace Open3dmm.Classes
             NativeAbstraction.GameTimer.Draw += OnRender;
         }
 
-        public void RenderOne()
-        {
-            rendering = true;
-        }
-
-        bool rendering;
-
         private void OnRender(GameTime gameTime)
         {
-            //if (rendering)
-            //{
-            //    rendering = false;
-            //    renderer.Render();
-            //}
-            renderer.Render();
+            if (NativeHandle.IsDisposed)
+                NativeAbstraction.GameTimer.Draw -= OnRender;
+            else
+                renderer.Render();
         }
     }
 }

@@ -2,10 +2,7 @@
 {
     public class GNV : BASE
     {
-        public GPT GPT {
-            get => GetReference<GPT>(0x008);
-            set => SetReference(value, 0x008);
-        }
-        public ref RECTANGLE Field001C => ref GetField<RECTANGLE>(0x1C);
+        public Ref<GPT> GPT => GetReference<GPT>(0x008);
+        public Pointer<RECTANGLE> Field001C  =>  GetField<RECTANGLE>(0x1C);
     }
 }

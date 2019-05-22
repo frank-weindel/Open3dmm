@@ -2,14 +2,7 @@
 {
     public class ACTN : BACO
     {
-        public GG Cells {
-            get => GetReference<GG>(0x0018);
-            set => SetReference(value, 0x0018);
-        }
-
-        public GL Transforms {
-            get => GetReference<GL>(0x001C);
-            set => SetReference(value, 0x001C);
-        }
+        public Ref<GG> Cells => GetReference<GG>(0x0018);
+        public Ref<GL> Transforms => GetReference<GL>(0x001C);
     }
 }

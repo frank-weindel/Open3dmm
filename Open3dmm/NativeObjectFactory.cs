@@ -11,6 +11,7 @@ namespace Open3dmm
         {
             factories = new Dictionary<ClassID, Func<NativeObject>>()
             {
+                { new ClassID("BASE"), () => new BASE() },
                 { new ClassID("ACTR"), () => new ACTR() },
                 { new ClassID("BACO"), () => new BACO() },
                 { new ClassID("ACTN"), () => new ACTN() },

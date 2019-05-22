@@ -2,6 +2,6 @@
 {
     public class BODY : BASE
     {
-        public ref RECTANGLE Rect => ref GetField<RECTANGLE>(0x24);
+        public Pointer<RECTANGLE> Rect => GetField<RECTANGLE>(0x24);
     }
 }

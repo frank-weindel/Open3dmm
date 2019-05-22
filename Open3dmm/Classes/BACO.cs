@@ -2,10 +2,7 @@
 {
     public class BACO : BASE
     {
-        public CRF CRF {
-            get => GetReference<CRF>(0x08);
-            set => SetReference(value, 0x08);
-        }
-        public ref QuadIDPair QuadIDPair => ref GetField<QuadIDPair>(0x0C);
+        public Ref<CRF> CRF => GetReference<CRF>(0x08);
+        public Pointer<QuadIDPair> QuadIDPair => GetField<QuadIDPair>(0x0C);
     }
 }

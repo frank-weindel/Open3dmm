@@ -2,6 +2,6 @@
 {
     public class TBXB : GOB
     {
-        public ref RECTANGLE Rectangle => ref GetField<RECTANGLE>(0x0084);
+        public Pointer<RECTANGLE> Rectangle  =>  GetField<RECTANGLE>(0x0084);
     }
 }

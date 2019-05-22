@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Open3dmm
@@ -101,6 +102,14 @@ namespace Open3dmm
     public static class Hook
     {
         static List<IHook> trackers = new List<IHook>();
+
+        public static void CreateHook<TDelegate>(IntPtr functionPointer, MethodInfo methodInfo) where TDelegate : Delegate
+        {
+            var callback = (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), null, methodInfo);
+            var hook = new DelegateHook<TDelegate>(functionPointer, ctx => callback);
+            trackers.Add(hook);
+            hook.Initialize();
+        }
 
         public static IHook Create<TDelegate>(IntPtr functionPointer, Func<HookContext<TDelegate>, TDelegate> getCallback) where TDelegate : Delegate
         {

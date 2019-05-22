@@ -4,7 +4,7 @@ namespace Open3dmm.Classes
 {
     public class APE : GOB
     {
-        public ref BrActor Light => ref GetField<BrActor>(0x00EC);
-        public ref BrMatrix34 Matrix => ref GetField<BrMatrix34>(0x0114);
+        public Pointer<BrActor> Light => GetField<BrActor>(0x00EC);
+        public Pointer<BrMatrix34> Matrix => GetField<BrMatrix34>(0x0114);
     }
 }

@@ -5,38 +5,29 @@ namespace Open3dmm.Classes
     public class GOB : CMH
     {
         public int Field000C {
-            get => GetField<int>(0x000C);
-            set => GetField<int>(0x000C) = value;
+            get => GetField<int>(0x000C).Value;
+            set => GetField<int>(0x000C).Value = value;
         }
-        public GPT GPT {
-            get => GetReference<GPT>(0x0010);
-            set => SetReference(value, 0x0010);
-        }
+        public Ref<GPT> GPT => GetReference<GPT>(0x0010);
 
         public RECTANGLE Rect {
-            get => GetField<RECTANGLE>(0x0018);
-            set => GetField<RECTANGLE>(0x0018) = value;
+            get => GetField<RECTANGLE>(0x0018).Value;
+            set => GetField<RECTANGLE>(0x0018).Value = value;
         }
 
         public int Flags {
-            get => GetField<int>(0x0058);
-            set => GetField<int>(0x0058) = value;
+            get => GetField<int>(0x0058).Value;
+            set => GetField<int>(0x0058).Value = value;
         }
 
-        public GOB Unk0058 {
-            get => GetReference<GOB>(0x0058);
-            set => SetReference(value, 0x0058);
-        }
-        public GOB Unk0060 {
-            get => GetReference<GOB>(0x0060);
-            set => SetReference(value, 0x0060);
-        }
+        public Ref<GOB> Unk0058 => GetReference<GOB>(0x0058);
+        public Ref<GOB> Unk0060 => GetReference<GOB>(0x0060);
 
         internal void Method004241B0(ref RECTANGLE _a4, int v2)
         {
             _a4 = this.Rect;
             Method004243A0(out var point, v2);
-            _a4.Translate(point.X - Rect.X1, point.Y - Rect.Y1);
+            _a4.Offset(point.X - Rect.Left, point.Y - Rect.Top);
         }
 
         public int Method004243A0(out POINT pt, int v2)
@@ -59,8 +50,8 @@ namespace Open3dmm.Classes
                     var gob = this;
                     while (gob != null && gob.Field000C == 0)
                     {
-                        pt.X += gob.Rect.X1;
-                        pt.Y += gob.Rect.Y1;
+                        pt.X += gob.Rect.Left;
+                        pt.Y += gob.Rect.Top;
                         gob = gob.Unk0058;
                     }
 

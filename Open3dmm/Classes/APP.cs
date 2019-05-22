@@ -13,27 +13,24 @@ namespace Open3dmm.Classes
         public static int PaletteVersion => Marshal.ReadInt32(new IntPtr(0x004E3CA8));
         public static int FlushCounter => Marshal.ReadInt32(new IntPtr(0x004E3CAC));
 
-        public void Method0041CFB0(GOB button, REGN reg, int flags, int arg4)
+        [HookFunction(0x00407610, CallingConvention = CallingConvention.ThisCall)]
+        public void AppMain(int param_1, int param_2, int param_3)
         {
-            if (!reg.RegionIsWhack(out var rect))
-            {
-                var v = RECTANGLE.Empty;
-                button.Method004241B0(ref v, 0);
-                if(v.CalculateIntersection(in rect))
-                {
-                    if((flags & 1) !=0 || (Flags00C & 2) != 0 && (flags & 2) == 0)
-                    {
-                        if (arg4 == 0 && button.Field000C != 0)
-                        {
-                            VirtualCall(0x50);
-                        }
-                        else
-                        {
+            UnmanagedFunctionCall.StdCall(new IntPtr(0x00407ad0));
+            FUN_0041bf30(param_1, param_2, param_3);
+        }
 
-                        }
-                    }
-                }
+        [HookFunction(0x0041bf30, CallingConvention = CallingConvention.ThisCall)]
+        public void FUN_0041bf30(int param_1, int param_2, int param_3)
+        {
+            IntPtr iVar1;
+            iVar1 = this.VirtualCall(0x24, new IntPtr(param_1), new IntPtr(param_2), new IntPtr(param_3));
+            if (iVar1 != IntPtr.Zero)
+            {
+                this.VirtualCall(0x30);
             }
+            this.VirtualCall(0x34);
+            return;
         }
     }
 }

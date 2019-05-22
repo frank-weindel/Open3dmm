@@ -9,6 +9,8 @@ namespace Open3dmm
         private NativeHandle nativeHandle;
 
         public NativeHandle NativeHandle => nativeHandle;
+        public Pointer<VTABLE> Vtable => GetField<VTABLE>(0x00);
+        public Pointer<int> NumReferences => GetField<int>(0x04);
 
         internal void SetHandle(NativeHandle nativeHandle)
         {
@@ -18,20 +20,14 @@ namespace Open3dmm
             Initialize();
         }
 
-        protected ref T GetField<T>(int offset, bool boundsChecking = true) where T : unmanaged
+        protected Pointer<T> GetField<T>(int offset, bool boundsChecking = true) where T : unmanaged
         {
-            return ref new Pointer<T>(CalculateAddressOfField(offset, boundsChecking)).Value;
+            return new Pointer<T>(CalculateAddressOfField(offset, boundsChecking));
         }
 
-        protected T GetReference<T>(int offset, bool boundsChecking = true) where T : NativeObject
+        protected Ref<T> GetReference<T>(int offset, bool boundsChecking = true) where T : NativeObject
         {
-            return FromPointer<T>(GetField<IntPtr>(offset, boundsChecking));
-        }
-
-        protected void SetReference<T>(T obj, int offset, bool boundsChecking = true) where T : NativeObject
-        {
-            obj.EnsureNotDisposed();
-            GetField<IntPtr>(offset, boundsChecking) = obj.NativeHandle.Address;
+            return new Ref<T>(CalculateAddressOfField(offset, boundsChecking));
         }
 
         public static T FromPointer<T>(IntPtr ptr) where T : NativeObject
@@ -60,7 +56,10 @@ namespace Open3dmm
             {
                 if (!nativeHandle.IsDisposed)
                 {
-                    classID = new ClassID((int)UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Marshal.ReadIntPtr(nativeHandle.Address), 4), nativeHandle.Address));
+                    var func = Marshal.ReadIntPtr(Marshal.ReadIntPtr(nativeHandle.Address), 4);
+                    if (func.ToInt32() < NativeAbstraction.ModuleHandle.ToInt32())
+                        goto Fail;
+                    classID = new ClassID((int)UnmanagedFunctionCall.ThisCall(func, nativeHandle.Address));
                     return true;
                 }
             }
@@ -68,6 +67,7 @@ namespace Open3dmm
             {
             }
 
+        Fail:
             classID = default;
             return false;
         }
@@ -104,6 +104,11 @@ namespace Open3dmm
             {
                 return ref *(byte*)nativeHandle.Address;
             }
+        }
+        public ClassID GetClassID()
+        {
+            EnsureNotDisposed();
+            return new ClassID((int)UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable, 4), NativeHandle.Address));
         }
     }
 }
