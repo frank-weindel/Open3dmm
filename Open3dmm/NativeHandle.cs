@@ -1,17 +1,25 @@
-﻿using System;
+﻿using Open3dmm.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Open3dmm
 {
-    public class NativeHandle : IDisposable
+    public unsafe class NativeHandle : IDisposable
     {
         private static readonly Dictionary<IntPtr, NativeHandle> nativeDictionary = new Dictionary<IntPtr, NativeHandle>();
 
         public static NativeHandle[] GetObjects()
         {
             return nativeDictionary.Values.ToArray();
+        }
+
+        public T ChangeType<T>() where T : NativeObject, new()
+        {
+            managedObject = new T();
+            managedObject.SetHandle(this);
+            return (T)managedObject;
         }
 
         public static bool TryDereference(IntPtr address, out NativeHandle handle)
@@ -72,17 +80,13 @@ namespace Open3dmm
         public bool IsDisposed => isDisposed;
 
         NativeObject managedObject;
-        public T QueryInterface<T>() where T : NativeObject
+        public T QueryInterface<T>() where T : NativeObject, new()
         {
             try
             {
-                if (managedObject is null)
+                if (!(managedObject is T))
                 {
-                    if (NativeObject.TryGetClassID(this, out var classID))
-                    {
-                        managedObject = NativeObjectFactory.Create(classID);
-                        managedObject.SetHandle(this);
-                    }
+                    managedObject = ChangeType<T>();
                 }
                 return (T)managedObject;
             }

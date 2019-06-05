@@ -3,42 +3,48 @@
 namespace Open3dmm.Classes
 {
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public unsafe ref struct Ref<T> where T : NativeObject
+    public unsafe struct Ref<T> where T : NativeObject, new()
     {
-        private string DebuggerDisplay => GetValue().ToString();
+        private string DebuggerDisplay => Value.ToString();
 
-        private readonly void** address;
+#if NATIVEDEP
+        private IntPtr address;
 
-        public T GetValue()
-        {
-            return NativeObject.FromPointer<T>(new IntPtr(*address));
+        public T Value {
+            get => NativeObject.FromPointer<T>(address);
+            set => address = value?.NativeHandle.Address ?? IntPtr.Zero;
         }
 
-        public void SetValue(T value)
+        public Ref(T obj)
         {
-            if (value == null)
-                *address = null;
-            else
-                *address = (void*)value.NativeHandle.Address;
+            this.address = obj.NativeHandle.Address;
         }
 
-        public void** ToPointer()
-        {
-            return address;
-        }
-
-        public Ref(IntPtr address) : this((void**)address)
-        {
-        }
-
-        public Ref(void** address)
+        public Ref(IntPtr address)
         {
             this.address = address;
         }
+#else
+        public T Value { get; set; }
 
-        public static implicit operator T(Ref<T> pointer)
+        public Ref(T obj)
         {
-            return pointer.GetValue();
+            Value = obj;
+        }
+
+        public Ref(IntPtr address)
+        {
+            throw new NotSupportedException();
+        }
+#endif
+        public static implicit operator Ref<T>(T obj)
+        {
+            return new Ref<T>(obj);
+        }
+
+        public static implicit operator T(Ref<T> reference)
+        {
+            return reference.Value;
         }
     }
 }

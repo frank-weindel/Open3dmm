@@ -33,10 +33,10 @@ namespace Open3dmm
             return 0;
         }
 
-        [HookFunction(0x004075f0, CallingConvention = CallingConvention.StdCall)]
+        [HookFunction(FunctionNames.AppMainStatic, CallingConvention = CallingConvention.StdCall)]
         public static void AppMainStatic()
         {
-            APP.Instance.AppMain(1, 0, 2);
+            APP.GlobalAPPInstance.AppMain(1, 0, 2);
         }
 
         [HookFunction(FunctionNames.Malloc, CallingConvention = CallingConvention.StdCall)]
@@ -51,5 +51,16 @@ namespace Open3dmm
             NativeHandle.Free(address);
             return true;
         }
+
+        //[HookFunction(0x0040caa0, CallingConvention = CallingConvention.ThisCall)]
+        //public static void UndefinedFunction_0040caa0(NativeObject @this, GNV pGParm2, RECTANGLE unk)
+        //{
+        //    var mbmp = @this.GetReference<MBMP>(0x138).GetValue();
+        //    if (mbmp != null)
+        //    {
+        //        Console.WriteLine($"{mbmp.QuadIDPair.Value.Quad.ToString()} - {mbmp.QuadIDPair.Value.ID}");
+        //        pGParm2.BlitMBMP(mbmp, rnd.Next(-64, 64), rnd.Next(-64, 64));
+        //    }
+        //}
     }
 }

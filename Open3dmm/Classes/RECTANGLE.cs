@@ -40,30 +40,17 @@ namespace Open3dmm.Classes
             this.Bottom = bottom;
         }
 
-        public static short MinExtent => Marshal.ReadInt16(new IntPtr(0x4D5328));
-
-        [HookFunction(FunctionNames.Rectangle_SizeLimit, CallingConvention = CallingConvention.ThisCall)]
-        public RECTANGLE* SizeLimit(RECTANGLE* dest)
+        [HookFunction(FunctionNames.RECTANGLE_ToGDI, CallingConvention = CallingConvention.ThisCall)]
+        public RECTANGLE* ToGDI(RECTANGLE* dest)
         {
-            void limit(in int input, out int output)
-            {
-                output = 0x7fff;
-                if (input < 0x8000)
-                {
-                    output = input;
-                    if (input < MinExtent)
-                        output = MinExtent;
-                }
-            }
-
-            limit(in Left, out dest->Left);
-            limit(in Top, out dest->Top);
-            limit(in Right, out dest->Right);
-            limit(in Bottom, out dest->Bottom);
+            GDIHelper.LimitFunction(in Left, out dest->Left);
+            GDIHelper.LimitFunction(in Top, out dest->Top);
+            GDIHelper.LimitFunction(in Right, out dest->Right);
+            GDIHelper.LimitFunction(in Bottom, out dest->Bottom);
             return dest;
         }
 
-        [HookFunction(FunctionNames.Rectangle_CalculateIntersection, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_CalculateIntersection, CallingConvention = CallingConvention.ThisCall)]
         public bool CalculateIntersection(RECTANGLE* other)
         {
             fixed (RECTANGLE* self = &this)
@@ -72,7 +59,7 @@ namespace Open3dmm.Classes
             }
         }
 
-        [HookFunction(FunctionNames.Rectangle_CalculateIntersectionBetween, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_CalculateIntersectionBetween, CallingConvention = CallingConvention.ThisCall)]
         public bool CalculateIntersection(RECTANGLE* a, RECTANGLE* b)
         {
             Left = Math.Max(a->Left, b->Left);
@@ -89,20 +76,20 @@ namespace Open3dmm.Classes
             return false;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Copy, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_Copy, CallingConvention = CallingConvention.ThisCall)]
         public void Copy(RECTANGLE* source)
         {
             this = *source;
         }
 
-        [HookFunction(FunctionNames.Rectangle_CopyAtOffset, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_CopyAtOffset, CallingConvention = CallingConvention.ThisCall)]
         public void Copy(RECTANGLE* source, int offsetX, int offsetY)
         {
             Copy(source);
             Offset(offsetX, offsetY);
         }
 
-        [HookFunction(FunctionNames.Rectangle_HitTest, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_HitTest, CallingConvention = CallingConvention.ThisCall)]
         public bool HitTest(int x, int y)
         {
             if (Left > x || Right <= x)
@@ -112,7 +99,7 @@ namespace Open3dmm.Classes
             return true;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Union, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_Union, CallingConvention = CallingConvention.ThisCall)]
         public void Union(RECTANGLE* other)
         {
             if (other->Left < other->Right && other->Top < other->Bottom)
@@ -134,7 +121,7 @@ namespace Open3dmm.Classes
             }
         }
 
-        [HookFunction(FunctionNames.Rectangle_TopLeftOrigin, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_TopLeftOrigin, CallingConvention = CallingConvention.ThisCall)]
         public void TopLeftOrigin()
         {
             Right -= Left;
@@ -142,7 +129,7 @@ namespace Open3dmm.Classes
             Left = Top = 0;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Offset, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_Offset, CallingConvention = CallingConvention.ThisCall)]
         public void Offset(int offsetX, int offsetY)
         {
             Left += offsetX;
@@ -151,7 +138,7 @@ namespace Open3dmm.Classes
             Bottom += offsetY;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Transform, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_Transform, CallingConvention = CallingConvention.ThisCall)]
         public void Transform(RECTANGLE* from, RECTANGLE* to)
         {
             int toWidth;
@@ -185,7 +172,7 @@ namespace Open3dmm.Classes
             }
         }
 
-        [HookFunction(FunctionNames.Rectangle_OneValidAndBothNotSame, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_OneValidAndBothNotSame, CallingConvention = CallingConvention.ThisCall)]
         public bool OneValidAndBothNotSame(RECTANGLE* other)
         {
             if (this.Top < this.Bottom)

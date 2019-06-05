@@ -1,16 +1,20 @@
 ﻿using Open3dmm.Classes;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Open3dmm
 {
-    public class NativeObject
+    public unsafe class NativeObject : IEquatable<NativeObject>
     {
         private NativeHandle nativeHandle;
 
         public NativeHandle NativeHandle => nativeHandle;
-        public Pointer<VTABLE> Vtable => GetField<VTABLE>(0x00);
-        public Pointer<int> NumReferences => GetField<int>(0x04);
+
+        [NativeFieldOffset(0x0)]
+        public extern ref VTABLE Vtable { get; }
+        [NativeFieldOffset(0x4)]
+        public extern ref int NumReferences { get; }
 
         internal void SetHandle(NativeHandle nativeHandle)
         {
@@ -20,22 +24,17 @@ namespace Open3dmm
             Initialize();
         }
 
-        protected Pointer<T> GetField<T>(int offset, bool boundsChecking = true) where T : unmanaged
+        public static Pointer<T> GetGlobal<T>(int address) where T : unmanaged
         {
-            return new Pointer<T>(CalculateAddressOfField(offset, boundsChecking));
+            return new Pointer<T>(new IntPtr(address));
         }
 
-        protected Ref<T> GetReference<T>(int offset, bool boundsChecking = true) where T : NativeObject
-        {
-            return new Ref<T>(CalculateAddressOfField(offset, boundsChecking));
-        }
-
-        public static T FromPointer<T>(IntPtr ptr) where T : NativeObject
+        public static T FromPointer<T>(IntPtr ptr) where T : NativeObject, new()
         {
             if (ptr == IntPtr.Zero)
                 return default;
             if (!NativeHandle.TryDereference(ptr, out var handle))
-                throw new InvalidCastException();
+                throw new InvalidOperationException();
             return handle.QueryInterface<T>();
         }
 
@@ -105,10 +104,35 @@ namespace Open3dmm
                 return ref *(byte*)nativeHandle.Address;
             }
         }
-        public ClassID GetClassID()
+
+        #region Equality Implementation
+
+        public override bool Equals(object obj)
         {
-            EnsureNotDisposed();
-            return new ClassID((int)UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable, 4), NativeHandle.Address));
+            return Equals(obj as NativeObject);
         }
+
+        public bool Equals(NativeObject other)
+        {
+            return other != null &&
+                   EqualityComparer<IntPtr>.Default.Equals(this.nativeHandle.Address, other.nativeHandle.Address);
+        }
+
+        public override int GetHashCode()
+        {
+            return -2057323372 + EqualityComparer<IntPtr>.Default.GetHashCode(this.nativeHandle.Address);
+        }
+
+        public static bool operator ==(NativeObject left, NativeObject right)
+        {
+            return EqualityComparer<NativeObject>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(NativeObject left, NativeObject right)
+        {
+            return !(left == right);
+        }
+
+        #endregion
     }
 }

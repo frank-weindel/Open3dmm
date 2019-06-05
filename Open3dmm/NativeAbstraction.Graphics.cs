@@ -40,10 +40,12 @@ namespace Open3dmm
             uiBuffer = new byte[640 * 480 * 4];
             SimpleTexture.SetData(new Color[] { Color.White });
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            GameTimer.Updated += ProcessUI;
-            GameTimer.Draw += RenderUI;
-            timerThread = new Thread(() => { while (true) GameTimer.Tick(); });
-            timerThread.Start();
+            //GameTimer.Updated += ProcessUI;
+            //GameTimer.Draw += RenderUI;
+            //timerThread = new Thread(() => { while (true) GameTimer.Tick(); });
+            //timerThread.IsBackground = true;
+            //timerThread.Priority = ThreadPriority.Lowest;
+            //timerThread.Start();
         }
 
         const int bmiSz = 40 + 4 * 256;

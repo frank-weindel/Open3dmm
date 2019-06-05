@@ -6,6 +6,12 @@ namespace Open3dmm
     public static unsafe class StructExtensions
     {
 #if NATIVEDEP
+
+        public static IntPtr AsPointer<T>(this ref T value) where T : struct
+        {
+            return new IntPtr(Unsafe.AsPointer(ref value));
+        }
+
         #region ThisCall
         public static IntPtr ThisCall<T>(ref this T obj, IntPtr address) where T : unmanaged
         {

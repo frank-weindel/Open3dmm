@@ -3,22 +3,61 @@ using System.Runtime.InteropServices;
 
 namespace Open3dmm.Classes
 {
-    public class BASE : NativeObject
+    [Vtable(0x4dd200)]
+    public unsafe partial class BASE : NativeObject
     {
+        private static readonly int classID = ClassID.ValueFromString("BASE");
+
         [HookFunction(FunctionNames.BASE_Init, CallingConvention = CallingConvention.ThisCall)]
-        public static IntPtr Init(IntPtr address)
+        public static IntPtr BASE_Init(IntPtr address)
         {
-            Marshal.WriteInt32(address, 0x4dd200);
-            Marshal.WriteInt32(address, 0x04, 1);
+            var h = NativeHandle.Dereference(address);
+            var obj = h.ChangeType<BASE>();
+            obj.Vtable = new VTABLE(0x4dd200);
+            obj.NumReferences = 1;
             return address;
         }
 
-        //public static IntPtr Init(IntPtr address)
-        //{
-        //    unsafe
-        //    {
-        //        return UnmanagedFunctionCall.ThisCall((IntPtr)0x004190f0, address);
-        //    }
-        //}
+        [HookFunction(FunctionNames.BASE_DecreaseReferenceCounter, CallingConvention = CallingConvention.ThisCall)]
+        public virtual void DecreaseReferenceCounter()
+        {
+            if (--NumReferences < 1 && this != null)
+            {
+#if NATIVEDEP
+                this.VirtualCall(0x8, new IntPtr(1));
+#else
+                Free(1);
+#endif
+            }
+        }
+
+        [HookFunction(FunctionNames.BASE_Free, CallingConvention = CallingConvention.ThisCall)]
+        public virtual IntPtr Free(byte free)
+        {
+            var address = NativeHandle.Address;
+            var obj = NativeHandle.ChangeType<BASE>();
+            obj.Vtable = new VTABLE(0x4dd200);
+            if ((free & 1) != 0)
+                Program.Free(address);
+            return address;
+        }
+
+        [HookFunction(FunctionNames.BASE_GetClassID, CallingConvention = CallingConvention.ThisCall)]
+        public virtual int GetClassID()
+        {
+            return classID;
+        }
+
+        [HookFunction(FunctionNames.BASE_IncreaseReferenceCounter, CallingConvention = CallingConvention.ThisCall)]
+        public virtual void IncreaseReferenceCounter()
+        {
+            NumReferences++;
+        }
+
+        [HookFunction(FunctionNames.BASE_IsAssignableFrom, CallingConvention = CallingConvention.ThisCall)]
+        public virtual bool IsAssignableFrom(int classID)
+        {
+            return BASE.classID == classID;
+        }
     }
 }

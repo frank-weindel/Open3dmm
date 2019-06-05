@@ -1,7 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Open3dmm.WinApi;
+﻿using Open3dmm.WinApi;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Open3dmm
@@ -13,24 +11,24 @@ namespace Open3dmm
         public static IntPtr MainWindowBitmap;
         static partial void SetWindowsApiHooks()
         {
-            ApiDetour.TryHook<StdCall1>(LibraryNames.USER32, "GetDC", (originalFunction) =>
-            {
-                return (hwnd) =>
-                {
-                    if (hwnd != IntPtr.Zero && hwnd == MainWindowHandle)
-                    {
-                        if (MainWindowDC == default)
-                        {
-                            var winDC = originalFunction(hwnd);
-                            MainWindowDC = PInvoke.Call(LibraryNames.GDI32, "CreateCompatibleDC", winDC);
-                            MainWindowBitmap = PInvoke.Call(LibraryNames.GDI32, "CreateCompatibleBitmap", winDC, new IntPtr(640), new IntPtr(480));
-                            PInvoke.Call(LibraryNames.GDI32, "SelectObject", MainWindowDC, MainWindowBitmap);
-                        }
-                        return MainWindowDC;
-                    }
-                    else return originalFunction(hwnd);
-                };
-            }, out _);
+            //ApiDetour.TryHook<StdCall1>(LibraryNames.USER32, "GetDC", (originalFunction) =>
+            //{
+            //    return (hwnd) =>
+            //    {
+            //        if (hwnd != IntPtr.Zero && hwnd == MainWindowHandle)
+            //        {
+            //            if (MainWindowDC == default)
+            //            {
+            //                var winDC = originalFunction(hwnd);
+            //                MainWindowDC = PInvoke.Call(LibraryNames.GDI32, "CreateCompatibleDC", winDC);
+            //                MainWindowBitmap = PInvoke.Call(LibraryNames.GDI32, "CreateCompatibleBitmap", winDC, new IntPtr(640), new IntPtr(480));
+            //                PInvoke.Call(LibraryNames.GDI32, "SelectObject", MainWindowDC, MainWindowBitmap);
+            //            }
+            //            return MainWindowDC;
+            //        }
+            //        else return originalFunction(hwnd);
+            //    };
+            //}, out _);
 
             ApiDetour.TryHook<StdCall12>(LibraryNames.USER32, "CreateWindowExA", originalFunction =>
             {

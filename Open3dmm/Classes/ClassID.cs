@@ -1,10 +1,13 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Open3dmm.Classes
 {
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
     [StructLayout(LayoutKind.Sequential, Size = 4)]
     public readonly struct ClassID
     {
+        private string DebuggerDisplay => ToString();
         public readonly int Value;
 
         public ClassID(int id)
@@ -68,6 +71,11 @@ namespace Open3dmm.Classes
         public static implicit operator ClassID(int v)
         {
             return new ClassID(v);
+        }
+
+        internal static int ValueFromString(string str)
+        {
+            return new ClassID(str).Value;
         }
     }
 }

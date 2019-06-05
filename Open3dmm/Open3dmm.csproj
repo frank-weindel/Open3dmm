@@ -37,10 +37,11 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NATIVEDEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,6 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -63,6 +65,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BaseAddress>16777216</BaseAddress>
+    <NoWarn>CS0626</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -169,61 +172,203 @@
     <Compile Include="BRender\BrVector4.cs" />
     <Compile Include="BRender\BrVertex.cs" />
     <Compile Include="BRender\BrVertexGroup.cs" />
-    <Compile Include="Classes\ACTN.cs" />
-    <Compile Include="Classes\ACTR.cs" />
-    <Compile Include="Classes\All.cs" />
-    <Compile Include="Classes\APE.cs" />
-    <Compile Include="Classes\APP.cs" />
-    <Compile Include="Classes\APPB.cs" />
-    <Compile Include="Classes\BACO.cs" />
+    <Compile Include="Classes\AutoClass1_Rectangles.cs" />
     <Compile Include="Classes\BASE.cs" />
-    <Compile Include="Classes\BCL.cs" />
-    <Compile Include="Classes\BCLS.cs" />
-    <Compile Include="Classes\BKGD.cs" />
-    <Compile Include="Classes\BLCK.cs" />
-    <Compile Include="Classes\BLL.cs" />
-    <Compile Include="Classes\BODY.cs" />
-    <Compile Include="Classes\BRCL.cs" />
-    <Compile Include="Classes\BRCN.cs" />
-    <Compile Include="Classes\BSF.cs" />
-    <Compile Include="Classes\BSM.cs" />
-    <Compile Include="Classes\BWLD.cs" />
-    <Compile Include="Classes\CABO.cs" />
-    <Compile Include="Classes\CAMS.cs" />
-    <Compile Include="Classes\CFL.cs" />
-    <Compile Include="Classes\CLOK.cs" />
-    <Compile Include="Classes\CMTL.cs" />
-    <Compile Include="Classes\CTL.cs" />
-    <Compile Include="Classes\CURS.cs" />
-    <Compile Include="Classes\DOCB.cs" />
-    <Compile Include="Classes\FIL.cs" />
-    <Compile Include="Classes\GKDS.cs" />
-    <Compile Include="Classes\GNV.cs" />
-    <Compile Include="Classes\GOB.cs" />
-    <Compile Include="Classes\GOKD.cs" />
-    <Compile Include="Classes\GPT.cs" />
+    <Compile Include="Classes\BASE\ACLP.cs" />
+    <Compile Include="Classes\BASE\ACTN.cs" />
+    <Compile Include="Classes\BASE\ACTR.cs" />
+    <Compile Include="Classes\BASE\AG.cs" />
+    <Compile Include="Classes\BASE\AL.cs" />
+    <Compile Include="Classes\BASE\AMQU.cs" />
+    <Compile Include="Classes\BASE\APE.cs" />
+    <Compile Include="Classes\BASE\APP.cs" />
+    <Compile Include="Classes\BASE\APPB.cs" />
+    <Compile Include="Classes\BASE\AUND.cs" />
+    <Compile Include="Classes\BASE\BACO.cs" />
+    <Compile Include="Classes\BASE\BCL.cs" />
+    <Compile Include="Classes\BASE\BCLS.cs" />
+    <Compile Include="Classes\BASE\BKGD.cs" />
+    <Compile Include="Classes\BASE\BLCK.cs" />
+    <Compile Include="Classes\BASE\BLL.cs" />
+    <Compile Include="Classes\BASE\BODY.cs" />
+    <Compile Include="Classes\BASE\BRCL.cs" />
+    <Compile Include="Classes\BASE\BRCN.cs" />
+    <Compile Include="Classes\BASE\BRWA.cs" />
+    <Compile Include="Classes\BASE\BRWB.cs" />
+    <Compile Include="Classes\BASE\BRWC.cs" />
+    <Compile Include="Classes\BASE\BRWD.cs" />
+    <Compile Include="Classes\BASE\BRWL.cs" />
+    <Compile Include="Classes\BASE\BRWM.cs" />
+    <Compile Include="Classes\BASE\BRWN.cs" />
+    <Compile Include="Classes\BASE\BRWP.cs" />
+    <Compile Include="Classes\BASE\BRWR.cs" />
+    <Compile Include="Classes\BASE\BRWT.cs" />
+    <Compile Include="Classes\BASE\BSF.cs" />
+    <Compile Include="Classes\BASE\BSM.cs" />
+    <Compile Include="Classes\BASE\BWLD.cs" />
+    <Compile Include="Classes\BASE\CABO.cs" />
+    <Compile Include="Classes\BASE\CAMS.cs" />
+    <Compile Include="Classes\BASE\CEX.cs" />
+    <Compile Include="Classes\BASE\CFL.cs" />
+    <Compile Include="Classes\BASE\CGE.cs" />
+    <Compile Include="Classes\BASE\CLIP.cs" />
+    <Compile Include="Classes\BASE\CLOK.cs" />
+    <Compile Include="Classes\BASE\CMH.cs" />
+    <Compile Include="Classes\BASE\CMTL.cs" />
+    <Compile Include="Classes\BASE\CODC.cs" />
+    <Compile Include="Classes\BASE\CODM.cs" />
+    <Compile Include="Classes\BASE\COST.cs" />
+    <Compile Include="Classes\BASE\CRF.cs" />
+    <Compile Include="Classes\BASE\CRM.cs" />
+    <Compile Include="Classes\BASE\CTL.cs" />
+    <Compile Include="Classes\BASE\CURS.cs" />
+    <Compile Include="Classes\BASE\DDG.cs" />
+    <Compile Include="Classes\BASE\DLG.cs" />
+    <Compile Include="Classes\BASE\DMD.cs" />
+    <Compile Include="Classes\BASE\DMW.cs" />
+    <Compile Include="Classes\BASE\DOCB.cs" />
+    <Compile Include="Classes\BASE\DSG.cs" />
+    <Compile Include="Classes\BASE\DSSM.cs" />
+    <Compile Include="Classes\BASE\DSSP.cs" />
+    <Compile Include="Classes\BASE\DTE.cs" />
+    <Compile Include="Classes\BASE\EDCB.cs" />
+    <Compile Include="Classes\BASE\EDPL.cs" />
+    <Compile Include="Classes\BASE\EDSL.cs" />
+    <Compile Include="Classes\BASE\ERS.cs" />
+    <Compile Include="Classes\BASE\ESL.cs" />
+    <Compile Include="Classes\BASE\ESLA.cs" />
+    <Compile Include="Classes\BASE\ESLL.cs" />
+    <Compile Include="Classes\BASE\ESLR.cs" />
+    <Compile Include="Classes\BASE\ESLT.cs" />
+    <Compile Include="Classes\BASE\FIL.cs" />
+    <Compile Include="Classes\BASE\FNE.cs" />
+    <Compile Include="Classes\BASE\FNET.cs" />
+    <Compile Include="Classes\BASE\FNI.cs" />
+    <Compile Include="Classes\BASE\GG.cs" />
+    <Compile Include="Classes\BASE\GGB.cs" />
+    <Compile Include="Classes\BASE\GKDS.cs" />
+    <Compile Include="Classes\BASE\GL.cs" />
+    <Compile Include="Classes\BASE\GLB.cs" />
+    <Compile Include="Classes\BASE\GNV.cs" />
+    <Compile Include="Classes\BASE\GOB.cs" />
+    <Compile Include="Classes\BASE\GOK.cs" />
+    <Compile Include="Classes\BASE\GOKD.cs" />
+    <Compile Include="Classes\BASE\GOMP.cs" />
+    <Compile Include="Classes\BASE\GORB.cs" />
+    <Compile Include="Classes\BASE\GORF.cs" />
+    <Compile Include="Classes\BASE\GORP.cs" />
+    <Compile Include="Classes\BASE\GORT.cs" />
+    <Compile Include="Classes\BASE\GORV.cs" />
+    <Compile Include="Classes\BASE\GPT.cs" />
+    <Compile Include="Classes\BASE\GRPB.cs" />
+    <Compile Include="Classes\BASE\GST.cs" />
+    <Compile Include="Classes\BASE\GSTB.cs" />
+    <Compile Include="Classes\BASE\GTE.cs" />
+    <Compile Include="Classes\BASE\GVDS.cs" />
+    <Compile Include="Classes\BASE\GVDW.cs" />
+    <Compile Include="Classes\BASE\GVID.cs" />
+    <Compile Include="Classes\BASE\HBAL.cs" />
+    <Compile Include="Classes\BASE\HBTN.cs" />
+    <Compile Include="Classes\BASE\KCDC.cs" />
+    <Compile Include="Classes\BASE\KWA.cs" />
+    <Compile Include="Classes\BASE\MBMP.cs" />
+    <Compile Include="Classes\BASE\MDPS.cs" />
+    <Compile Include="Classes\BASE\MDWS.cs" />
+    <Compile Include="Classes\BASE\MIDO.cs" />
+    <Compile Include="Classes\BASE\MIDS.cs" />
+    <Compile Include="Classes\BASE\MISI.cs" />
+    <Compile Include="Classes\BASE\MODL.cs" />
+    <Compile Include="Classes\BASE\MP.cs" />
+    <Compile Include="Classes\BASE\MPFT.cs" />
+    <Compile Include="Classes\BASE\MSMX.cs" />
+    <Compile Include="Classes\BASE\MSND.cs" />
+    <Compile Include="Classes\BASE\MSQ.cs" />
+    <Compile Include="Classes\BASE\MSQU.cs" />
+    <Compile Include="Classes\BASE\MSTP.cs" />
+    <Compile Include="Classes\BASE\MTRL.cs" />
+    <Compile Include="Classes\BASE\MUB.cs" />
+    <Compile Include="Classes\BASE\MUNB.cs" />
+    <Compile Include="Classes\BASE\MUNS.cs" />
+    <Compile Include="Classes\BASE\MVIE.cs" />
+    <Compile Include="Classes\BASE\MVU.cs" />
+    <Compile Include="Classes\BASE\NTL.cs" />
+    <Compile Include="Classes\BASE\OMS.cs" />
+    <Compile Include="Classes\BASE\RCA.cs" />
+    <Compile Include="Classes\BASE\REGN.cs" />
+    <Compile Include="Classes\BASE\RGSC.cs" />
+    <Compile Include="Classes\BASE\RND.cs" />
+    <Compile Include="Classes\BASE\RTUN.cs" />
+    <Compile Include="Classes\BASE\SCB.cs" />
+    <Compile Include="Classes\BASE\SCEB.cs" />
+    <Compile Include="Classes\BASE\SCEG.cs" />
+    <Compile Include="Classes\BASE\SCEN.cs" />
+    <Compile Include="Classes\BASE\SCPT.cs" />
+    <Compile Include="Classes\BASE\SCRT.cs" />
+    <Compile Include="Classes\BASE\SDAM.cs" />
+    <Compile Include="Classes\BASE\SFL.cs" />
+    <Compile Include="Classes\BASE\SMCC.cs" />
+    <Compile Include="Classes\BASE\SNDM.cs" />
+    <Compile Include="Classes\BASE\SNDV.cs" />
+    <Compile Include="Classes\BASE\SNE.cs" />
+    <Compile Include="Classes\BASE\SNMQ.cs" />
+    <Compile Include="Classes\BASE\SNQU.cs" />
+    <Compile Include="Classes\BASE\SPLT.cs" />
+    <Compile Include="Classes\BASE\SREC.cs" />
+    <Compile Include="Classes\BASE\SSCB.cs" />
+    <Compile Include="Classes\BASE\STIO.cs" />
+    <Compile Include="Classes\BASE\STRG.cs" />
+    <Compile Include="Classes\BASE\SUNA.cs" />
+    <Compile Include="Classes\BASE\SUNC.cs" />
+    <Compile Include="Classes\BASE\SUNK.cs" />
+    <Compile Include="Classes\BASE\SUNP.cs" />
+    <Compile Include="Classes\BASE\SUNS.cs" />
+    <Compile Include="Classes\BASE\SUNX.cs" />
+    <Compile Include="Classes\BASE\TAGL.cs" />
+    <Compile Include="Classes\BASE\TAGM.cs" />
+    <Compile Include="Classes\BASE\TATR.cs" />
+    <Compile Include="Classes\BASE\TBOX.cs" />
+    <Compile Include="Classes\BASE\TBXB.cs" />
+    <Compile Include="Classes\BASE\TBXG.cs" />
+    <Compile Include="Classes\BASE\TDF.cs" />
+    <Compile Include="Classes\BASE\TDT.cs" />
+    <Compile Include="Classes\BASE\TGOB.cs" />
+    <Compile Include="Classes\BASE\TMAP.cs" />
+    <Compile Include="Classes\BASE\TMPL.cs" />
+    <Compile Include="Classes\BASE\TUNC.cs" />
+    <Compile Include="Classes\BASE\TUND.cs" />
+    <Compile Include="Classes\BASE\TUNH.cs" />
+    <Compile Include="Classes\BASE\TUNS.cs" />
+    <Compile Include="Classes\BASE\TUNT.cs" />
+    <Compile Include="Classes\BASE\TXHD.cs" />
+    <Compile Include="Classes\BASE\TXHG.cs" />
+    <Compile Include="Classes\BASE\TXRD.cs" />
+    <Compile Include="Classes\BASE\TXRG.cs" />
+    <Compile Include="Classes\BASE\TXTB.cs" />
+    <Compile Include="Classes\BASE\TXTG.cs" />
+    <Compile Include="Classes\BASE\UNDB.cs" />
+    <Compile Include="Classes\BASE\USAC.cs" />
+    <Compile Include="Classes\BASE\WMS.cs" />
+    <Compile Include="Classes\BASE\WOKS.cs" />
+    <Compile Include="Classes\BASE\WSB.cs" />
+    <Compile Include="Classes\BASE\ZBMP.cs" />
+    <Compile Include="Classes\CoordinateSpace.cs" />
+    <Compile Include="Classes\FixedArray.cs" />
+    <Compile Include="Classes\GlobalVariables.cs" />
+    <Compile Include="Classes\GNV_UnkStruct1.cs" />
     <Compile Include="Classes\GPT_UnkStruct1.cs" />
-    <Compile Include="Classes\MBMP.cs" />
-    <Compile Include="Classes\MDWS.cs" />
-    <Compile Include="Classes\MIDS.cs" />
-    <Compile Include="Classes\MODL.cs" />
     <Compile Include="Classes\POINT.cs" />
     <Compile Include="Classes\Pointer.cs" />
     <Compile Include="Classes\Quad.cs" />
     <Compile Include="Classes\QuadIDPair.cs" />
     <Compile Include="Classes\RECTANGLE.cs" />
     <Compile Include="Classes\Ref.cs" />
-    <Compile Include="Classes\REGN.cs" />
     <Compile Include="Classes\RGBQUAD.cs" />
-    <Compile Include="Classes\SCB.cs" />
-    <Compile Include="Classes\TBXB.cs" />
-    <Compile Include="Classes\TBXG.cs" />
-    <Compile Include="Classes\TDT.cs" />
     <Compile Include="Classes\VTABLE.cs" />
-    <Compile Include="Classes\ZBMP.cs" />
     <Compile Include="GameTimer.cs" />
+    <Compile Include="GDIHelper.cs" />
     <Compile Include="Graphics\BrWorldRenderer.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="HookFunctionAttribute.cs" />
     <Compile Include="ManagedArray.cs" />
     <Compile Include="Classes\ClassID.cs" />
@@ -231,12 +376,15 @@
     <Compile Include="Hook.cs" />
     <Compile Include="NativeAbstraction.Graphics.cs" />
     <Compile Include="NativeAbstraction.Hooks.cs" />
+    <Compile Include="NativeFieldOffsetAttribute.cs" />
     <Compile Include="NativeHandle.cs" />
     <Compile Include="NativeObject.cs" />
     <Compile Include="NativeObjectExtensions.cs" />
-    <Compile Include="NativeObjectFactory.cs" />
     <Compile Include="NativeWeaver.cs" />
+    <Compile Include="RegisterParamAttribute.cs" />
+    <Compile Include="Registers.cs" />
     <Compile Include="StructExtensions.cs" />
+    <Compile Include="VtableAttribute.cs" />
     <Compile Include="WinApi\ApiDetour.cs" />
     <Compile Include="NativeAbstraction.Imports.cs" />
     <Compile Include="PE\IMAGE_IMPORT_BY_NAME.cs" />

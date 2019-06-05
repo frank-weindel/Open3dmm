@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Open3dmm.Classes
 {
@@ -14,5 +15,7 @@ namespace Open3dmm.Classes
         {
             Address = address;
         }
+
+        public IntPtr this[int index] => Marshal.ReadIntPtr(Address, index * 0x4);
     }
 }
