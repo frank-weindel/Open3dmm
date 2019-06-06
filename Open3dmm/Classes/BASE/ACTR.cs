@@ -15,6 +15,7 @@ namespace Open3dmm.Classes
         public extern ref BrMatrix34 TransformMatrix { get; }
 
         [HookFunction(FunctionNames.ACTR_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.ACTR__IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
         public override bool IsDerivedFrom(int classID)
         {
             return classID == ACTR.classID || base.IsDerivedFrom(classID);

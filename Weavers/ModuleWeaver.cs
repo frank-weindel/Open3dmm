@@ -44,21 +44,15 @@ namespace Weavers
             init.Body.Variables.Clear();
             init.Body.Instructions.Clear();
             var ilInit = init.Body.GetILProcessor();
-            var targetMethods = new List<(MethodDefinition method, CustomAttribute attr)>();
+            var targetMethods = new List<IGrouping<(MethodDefinition, CallingConvention), CustomAttribute>>();
             var targetProperties = new List<(PropertyDefinition prop, CustomAttribute attr)>();
             foreach (var type in this.ModuleDefinition.Types)
             {
-                foreach (var method in type.Methods)
-                {
-                    var attr = method.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "Open3dmm.HookFunctionAttribute");
-                    if (attr == null)
-                        continue;
-
-                    if (method.HasGenericParameters)
-                        throw new NotSupportedException("Methods with generic parameters not supported");
-
-                    targetMethods.Add((method, attr));
-                }
+                targetMethods.AddRange(from method in type.Methods
+                                       from attr in method.CustomAttributes.Where(a => a.AttributeType.FullName == "Open3dmm.HookFunctionAttribute")
+                                       let propCallingConvention = attr.Properties.First(p => p.Name.Contains("CallingConvention"))
+                                       let callingConvention = (CallingConvention)propCallingConvention.Argument.Value
+                                       group attr by (method, callingConvention));
 
                 foreach (var prop in type.Properties)
                 {
@@ -70,26 +64,33 @@ namespace Weavers
                 }
             }
 
-            foreach (var (method, attr) in targetMethods)
+            foreach (var grouping in targetMethods)
             {
-                var propCallingConvention = attr.Properties.First(p => p.Name.Contains("CallingConvention"));
-                var callingConvention = (CallingConvention)propCallingConvention.Argument.Value;
-                var hookAddress = (IntPtr)Convert.ToInt32(attr.ConstructorArguments[0].Value);
+                var (method, callingConvention) = grouping.Key;
+
+                if (method.HasGenericParameters)
+                    throw new NotSupportedException("Methods with generic parameters not supported");
 
                 var transitionalMethod = CreateTransitionalMethod(callingConvention, method, out var delegateType);
                 method.DeclaringType.Methods.Add(transitionalMethod.Resolve());
                 transitionalMethod = ModuleDefinition.ImportReference(transitionalMethod);
-                if (transitionalMethod != null)
-                {
-                    ilInit.Emit(OpCodes.Ldc_I4, (int)hookAddress);
-                    //il.Emit(OpCodes.Ldtoken, transitionalMethod);
-                    //il.Emit(OpCodes.Call, prepareMethod);
-                    ilInit.Emit(OpCodes.Ldtoken, transitionalMethod);
-                    ilInit.Emit(OpCodes.Call, getMethodFromHandle);
-                    ilInit.Emit(OpCodes.Castclass, methodInfoType);
 
-                    var createHookGeneric = createHook.MakeGenericMethod(delegateType);
-                    ilInit.Emit(OpCodes.Call, createHookGeneric);
+                foreach (var attr in grouping)
+                {
+                    var hookAddress = (IntPtr)Convert.ToInt32(attr.ConstructorArguments[0].Value);
+
+                    if (transitionalMethod != null)
+                    {
+                        ilInit.Emit(OpCodes.Ldc_I4, (int)hookAddress);
+                        //il.Emit(OpCodes.Ldtoken, transitionalMethod);
+                        //il.Emit(OpCodes.Call, prepareMethod);
+                        ilInit.Emit(OpCodes.Ldtoken, transitionalMethod);
+                        ilInit.Emit(OpCodes.Call, getMethodFromHandle);
+                        ilInit.Emit(OpCodes.Castclass, methodInfoType);
+
+                        var createHookGeneric = createHook.MakeGenericMethod(delegateType);
+                        ilInit.Emit(OpCodes.Call, createHookGeneric);
+                    }
                 }
             }
             ilInit.Emit(OpCodes.Ret);
@@ -130,7 +131,7 @@ namespace Weavers
             var intPtrAdd = ModuleDefinition.ImportReference(intPtrAddMethod);
             var typeFromHandle = ModuleDefinition.ImportReference(typeFromHandleMethod);
             var intPtrToPointer = ModuleDefinition.ImportReference(intPtrToPointerMethod);
-            
+
             foreach (var (prop, attr) in targetProperties)
             {
                 var fieldOffset = Convert.ToInt32(attr.ConstructorArguments[0].Value);
@@ -182,7 +183,7 @@ namespace Weavers
 
         private MethodReference CreateTransitionalMethod(CallingConvention callingConvention, MethodDefinition method, out TypeReference delegateType)
         {
-            string methodName = "___TransitionalMethod_" + method.Name;
+            string methodName = "___Transitional_" + callingConvention + "_Method_" + method.Name;
             var methodAttr = method.Attributes;
             methodAttr &= ~Mono.Cecil.MethodAttributes.Public;
             methodAttr &= ~Mono.Cecil.MethodAttributes.Virtual;

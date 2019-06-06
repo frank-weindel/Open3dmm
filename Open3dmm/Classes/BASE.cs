@@ -55,6 +55,7 @@ namespace Open3dmm.Classes
         }
 
         [HookFunction(FunctionNames.BASE_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.BASE__IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
         public virtual bool IsDerivedFrom(int classID)
         {
             return BASE.classID == classID;

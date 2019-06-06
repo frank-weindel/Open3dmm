@@ -20,6 +20,7 @@ namespace Open3dmm.Classes
         }
 
         [HookFunction(FunctionNames.CMH_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.CMH__IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
         public override bool IsDerivedFrom(int classID)
         {
             return classID == 0x434d48 || base.IsDerivedFrom(classID);
