@@ -54,8 +54,8 @@ namespace Open3dmm.Classes
             NumReferences++;
         }
 
-        [HookFunction(FunctionNames.BASE_IsAssignableFrom, CallingConvention = CallingConvention.ThisCall)]
-        public virtual bool IsAssignableFrom(int classID)
+        [HookFunction(FunctionNames.BASE_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        public virtual bool IsDerivedFrom(int classID)
         {
             return BASE.classID == classID;
         }

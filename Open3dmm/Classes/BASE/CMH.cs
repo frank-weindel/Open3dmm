@@ -19,10 +19,10 @@ namespace Open3dmm.Classes
             return address;
         }
 
-        [HookFunction(FunctionNames.CMH_IsAssignableFrom, CallingConvention = CallingConvention.ThisCall)]
-        public override bool IsAssignableFrom(int classID)
+        [HookFunction(FunctionNames.CMH_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        public override bool IsDerivedFrom(int classID)
         {
-            return classID == 0x434d48 || base.IsAssignableFrom(classID);
+            return classID == 0x434d48 || base.IsDerivedFrom(classID);
         }
 
         [HookFunction(FunctionNames.CMH_GetClassID, CallingConvention = CallingConvention.ThisCall)]

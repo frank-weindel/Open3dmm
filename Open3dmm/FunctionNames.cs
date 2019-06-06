@@ -73,15 +73,17 @@
         BASE_IncreaseReferenceCounter = 0x00419100,
         BASE_Free = 0x00401B70,
         BASE_GetClassID = 0x004190A0,
-        BASE_IsAssignableFrom = 0x004190b0,
+        BASE_IsDerivedFrom = 0x004190b0,
         CMH_Free = 0x0041F560,
         CMH__Free = 0x0041E320,
         CMH_GetClassID = 0x0041E250,
-        CMH_IsAssignableFrom = 0x0041E240,
+        CMH_IsDerivedFrom = 0x0041E240,
         CMH_VirtualFunc6 = 0x0041F630,
         CMH_VirtualFunc7 = 0x0041E350,
         CMH_Init = 0x0041e300,
         GOB_Init = 0x00422db0,
-        GOB_GetPrevious = 0x00424990
+        GOB_GetPrevious = 0x00424990,
+        ACTR_IsDerivedFrom = 0x004baeb0,
+        ACTR__IsDerivedFrom = 0x004bae90
     }
 }
