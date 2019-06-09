@@ -19,7 +19,7 @@ namespace Open3dmm
                 {
                     var bwld = NativeObject.FromPointer<BWLD>(ecx);
                     ctx.CallOriginal(o => o(ecx));
-                    bwld.RenderOne();
+                     bwld.RenderOne();
                     return new IntPtr(1);
                 };
             }).Initialize();
@@ -156,6 +156,7 @@ namespace Open3dmm
                 return (ecx, arg1, arg2, arg3) =>
                 {
                     var gpt = NativeObject.FromPointer<GPT>(ecx);
+                    
                     var mbmp = NativeObject.FromPointer<MBMP>(arg1);
                     gpt.BlitMBMP(mbmp, *(RECTANGLE*)arg2, (GPT_UnkStruct1*)arg3);
                     return IntPtr.Zero;

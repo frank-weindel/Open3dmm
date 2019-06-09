@@ -15,6 +15,7 @@ namespace Open3dmm
             {
                 var dllName = Marshal.PtrToStringAnsi(ModuleHandle + importDesc.Name.ToInt32());
                 var hmodule = Kernel32.LoadLibrary(dllName);
+                Console.WriteLine("Loading Import: " + dllName);
                 if (hmodule == IntPtr.Zero)
                     throw new InvalidOperationException($"Library could not be loaded: {dllName}");
                 var addr = (int)importDesc.OriginalFirstThunk;
@@ -29,6 +30,8 @@ namespace Open3dmm
                     var procName = Marshal.PtrToStringAnsi(ModuleHandle + importByNameOffset + 2);
                     // Get procedure address
                     var procAddr = Kernel32.GetProcAddress(hmodule, procName);
+                    Console.WriteLine("importByName: " + importByName + ", Proc Name: " + procName);
+
                     if (procAddr == IntPtr.Zero)
                         throw new InvalidOperationException($"Couldn't find procedure: {dllName}::{procName}");
                     Marshal.WriteIntPtr(ModuleHandle + linkAddr, procAddr);

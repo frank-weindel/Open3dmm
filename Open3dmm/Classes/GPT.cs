@@ -35,6 +35,12 @@ namespace Open3dmm.Classes
             base.Initialize();
             graphicsDevice = NativeAbstraction.GraphicsDevice;
             spriteBatch = NativeAbstraction.SpriteBatch;
+
+            Program.debugForm.BeginInvoke((Action)(() =>
+            {
+                Program.debugForm.gptList.Items.Add(this);
+            }));
+
             renderTarget = new RenderTarget2D(graphicsDevice, 640, 480);
         }
 

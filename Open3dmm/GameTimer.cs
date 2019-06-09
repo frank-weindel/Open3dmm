@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Open3dmm
 {
@@ -26,74 +27,77 @@ namespace Open3dmm
 
         public void Tick()
         {
-        RetryTick:
-            // Advance the accumulated elapsed time.
-            var currentTicks = _gameTimer.Elapsed.Ticks;
-            _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
-            _previousTicks = currentTicks;
+//        RetryTick:
+//            // Advance the accumulated elapsed time.
+//            var currentTicks = _gameTimer.Elapsed.Ticks;
+//            _accumulatedElapsedTime += TimeSpan.FromTicks(currentTicks - _previousTicks);
+//            _previousTicks = currentTicks;
 
-            if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
-            {
-#if WINDOWS && !DESKTOPGL
-                // Sleep for as long as possible without overshooting the update time
-                var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
-                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
-#endif
-                // Keep looping until it's time to perform the next update
-                goto RetryTick;
-            }
+//            if (IsFixedTimeStep && _accumulatedElapsedTime < TargetElapsedTime)
+//            {
+//#if WINDOWS && !DESKTOPGL
+//                // Sleep for as long as possible without overshooting the update time
+//                var sleepTime = (TargetElapsedTime - _accumulatedElapsedTime).TotalMilliseconds;
+//                Utilities.TimerHelper.SleepForNoMoreThan(sleepTime);
+//#endif
+//                // Keep looping until it's time to perform the next update
+//                Thread.Sleep(0);
+//                goto RetryTick;
+//            }
 
-            // Do not allow any update to take longer than our maximum.
-            if (_accumulatedElapsedTime > _maxElapsedTime)
-                _accumulatedElapsedTime = _maxElapsedTime;
+//            // Do not allow any update to take longer than our maximum.
+//            if (_accumulatedElapsedTime > _maxElapsedTime)
+//                _accumulatedElapsedTime = _maxElapsedTime;
 
-            if (IsFixedTimeStep)
-            {
-                _gameTime.ElapsedGameTime = TargetElapsedTime;
-                var stepCount = 0;
+//            if (IsFixedTimeStep)
+//            {
+//                _gameTime.ElapsedGameTime = TargetElapsedTime;
+//                var stepCount = 0;
 
-                // Perform as many full fixed length time steps as we can.
-                while (_accumulatedElapsedTime >= TargetElapsedTime)
-                {
-                    _gameTime.TotalGameTime += TargetElapsedTime;
-                    _accumulatedElapsedTime -= TargetElapsedTime;
-                    ++stepCount;
+//                // Perform as many full fixed length time steps as we can.
+//                while (_accumulatedElapsedTime >= TargetElapsedTime)
+//                {
+//                    _gameTime.TotalGameTime += TargetElapsedTime;
+//                    _accumulatedElapsedTime -= TargetElapsedTime;
+//                    ++stepCount;
 
-                    DoUpdate(_gameTime);
-                }
+//                    DoUpdate(_gameTime);
+//                }
 
-                //Every update after the first accumulates lag
-                _updateFrameLag += Math.Max(0, stepCount - 1);
+//                //Every update after the first accumulates lag
+//                _updateFrameLag += Math.Max(0, stepCount - 1);
 
-                //If we think we are running slowly, wait until the lag clears before resetting it
-                if (_gameTime.IsRunningSlowly)
-                {
-                    if (_updateFrameLag == 0)
-                        _gameTime.IsRunningSlowly = false;
-                }
-                else if (_updateFrameLag >= 5)
-                {
-                    //If we lag more than 5 frames, start thinking we are running slowly
-                    _gameTime.IsRunningSlowly = true;
-                }
+//                //If we think we are running slowly, wait until the lag clears before resetting it
+//                if (_gameTime.IsRunningSlowly)
+//                {
+//                    if (_updateFrameLag == 0)
+//                        _gameTime.IsRunningSlowly = false;
+//                }
+//                else if (_updateFrameLag >= 5)
+//                {
+//                    //If we lag more than 5 frames, start thinking we are running slowly
+//                    _gameTime.IsRunningSlowly = true;
+//                }
 
-                //Every time we just do one update and one draw, then we are not running slowly, so decrease the lag
-                if (stepCount == 1 && _updateFrameLag > 0)
-                    _updateFrameLag--;
+//                //Every time we just do one update and one draw, then we are not running slowly, so decrease the lag
+//                if (stepCount == 1 && _updateFrameLag > 0)
+//                    _updateFrameLag--;
 
-                // Draw needs to know the total elapsed time
-                // that occured for the fixed length updates.
-                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
-            }
-            else
-            {
-                // Perform a single variable length update.
-                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
-                _gameTime.TotalGameTime += _accumulatedElapsedTime;
-                _accumulatedElapsedTime = TimeSpan.Zero;
+//                // Draw needs to know the total elapsed time
+//                // that occured for the fixed length updates.
+//                _gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
+//            }
+//            else
+//            {
+//                // Perform a single variable length update.
+//                _gameTime.ElapsedGameTime = _accumulatedElapsedTime;
+//                _gameTime.TotalGameTime += _accumulatedElapsedTime;
+//                _accumulatedElapsedTime = TimeSpan.Zero;
 
-                DoUpdate(_gameTime);
-            }
+//                DoUpdate(_gameTime);
+//            }
+
+            DoUpdate(_gameTime);
 
             // Draw unless the update suppressed it.
             if (_suppressDraw)

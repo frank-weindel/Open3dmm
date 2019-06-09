@@ -88,11 +88,12 @@ int main()
 	std::memcpy(str_dest, L"Open3dmm.dll\0Open3dmm.Program\0Bootstrap", 80);
 
 	//TODO: Detect 3dmm install directory
-
-	std::memcpy((void*)((int)str_dest + 80), "C:\\microsoft kids\\3d movie maker\\3dmovie.exe", 45);
+	char path[] = "C:\\Program Files (x86)\\Microsoft Kids\\3D Movie Maker\\3dmovie.exe";
+	size_t p = sizeof(path);
+	std::memcpy((void*)((int)str_dest + 80), path, p);
+	//std::memcpy((void*)((int)str_dest + 80), "C:\\microsoft kids\\3d movie maker\\3dmovie.exe", 45);
 
 	// CLR
-
 	ICLRMetaHost * metaHost = NULL;
 	ICLRRuntimeInfo * runtimeInfo = NULL;
 	ICLRRuntimeHost * runtimeHost = NULL;

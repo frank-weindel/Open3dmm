@@ -30,7 +30,7 @@ namespace Open3dmm.Graphics
             var viewport = GraphicsDevice.Viewport;
             try
             {
-                var vp = new Rectangle(48, 100,
+                var vp = new Rectangle(0, 0,
                                       world.Width1,
                                       world.Height1);
                 GraphicsDevice.Viewport = new Viewport(vp);
@@ -98,7 +98,7 @@ namespace Open3dmm.Graphics
         {
             // TODO: Use renderStyle to affect the way we render
             BasicEffect.World = world;
-            BasicEffect.DiffuseColor = Color.White.ToVector3(); // RandomColor().ToVector3();
+            BasicEffect.DiffuseColor = Color.PaleVioletRed.ToVector3(); // RandomColor().ToVector3();
             var m = ResolveModel(model);
             foreach (var p in BasicEffect.CurrentTechnique.Passes)
             {

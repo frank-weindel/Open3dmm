@@ -74,6 +74,14 @@ namespace Open3dmm.Classes
         protected override void Initialize()
         {
             base.Initialize();
+            Program.debugForm.BeginInvoke((Action)(() =>
+            {
+                Program.debugForm.textBox.Text = "" + this.NativeHandle.Address.ToInt32();
+                GPT a = this.Bitmap1;
+                GPT b = this.Bitmap2;
+
+            }));
+
             renderer = new BrWorldRenderer(this);
             NativeAbstraction.GameTimer.Draw += OnRender;
         }

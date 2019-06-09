@@ -42,7 +42,12 @@ namespace Open3dmm
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             GameTimer.Updated += ProcessUI;
             GameTimer.Draw += RenderUI;
-            timerThread = new Thread(() => { while (true) GameTimer.Tick(); });
+            timerThread = new Thread(() => {
+                while (true) {
+                    GameTimer.Tick();
+                    Thread.Sleep(0);
+                }
+            });
             timerThread.Start();
         }
 
@@ -53,8 +58,14 @@ namespace Open3dmm
 
         private static void ProcessUI(GameTime gameTime)
         {
-            if ((gameTime.TotalGameTime - lastUpdate).TotalSeconds < 0.33)
-                return;
+            //Program.debugForm.BeginInvoke((Action)(() =>
+            //{
+            //    Program.renderCount++;
+            //    Program.debugForm.textBox.Text = "" + Program.renderCount;
+            //}));
+
+            //if ((gameTime.TotalGameTime - lastUpdate).TotalSeconds < 0.33)
+            //    return;
 
             unsafe
             {
