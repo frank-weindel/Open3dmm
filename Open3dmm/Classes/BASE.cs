@@ -3,77 +3,62 @@ using System.Runtime.InteropServices;
 
 namespace Open3dmm.Classes
 {
-    public struct VTABLE
+    [Vtable(0x4dd200)]
+    public unsafe partial class BASE : NativeObject
     {
-        public IntPtr Address;
-    }
+        private static readonly int classID = ClassID.ValueFromString("BASE");
 
-    public class BASE : NativeObject
-    {
-        public VTABLE Vtable => GetField<VTABLE>(0);
-        public int NumReferences => GetField<int>(4);
-
-        public ClassID GetClassID()
+        [HookFunction(FunctionNames.BASE_Init, CallingConvention = CallingConvention.ThisCall)]
+        public static IntPtr BASE_Init(IntPtr address)
         {
-            EnsureNotDisposed();
-            return new ClassID((int)UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable, 4), NativeHandle.Address));
+            var h = NativeHandle.Dereference(address);
+            var obj = h.ChangeType<BASE>();
+            obj.Vtable = new VTABLE(0x4dd200);
+            obj.NumReferences = 1;
+            return address;
         }
 
-        #region VirtualCall
-        public IntPtr VirtualCall(int offset)
+        [HookFunction(FunctionNames.BASE_DecreaseReferenceCounter, CallingConvention = CallingConvention.ThisCall)]
+        public virtual void DecreaseReferenceCounter()
         {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7, IntPtr arg8)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7, IntPtr arg8, IntPtr arg9)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7, IntPtr arg8, IntPtr arg9, IntPtr arg10)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+            if (--NumReferences < 1 && this != null)
+            {
+#if NATIVEDEP
+                this.VirtualCall(0x8, new IntPtr(1));
+#else
+                Free(1);
+#endif
+            }
         }
 
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7, IntPtr arg8, IntPtr arg9, IntPtr arg10, IntPtr arg11)
+        [HookFunction(FunctionNames.BASE_Free, CallingConvention = CallingConvention.ThisCall)]
+        public virtual IntPtr Free(byte free)
         {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
-        }
-        public IntPtr VirtualCall(int offset, IntPtr arg1, IntPtr arg2, IntPtr arg3, IntPtr arg4, IntPtr arg5, IntPtr arg6, IntPtr arg7, IntPtr arg8, IntPtr arg9, IntPtr arg10, IntPtr arg11, IntPtr arg12)
-        {
-            return UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Vtable.Address) + offset, NativeHandle.Address, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+            var address = NativeHandle.Address;
+            var obj = NativeHandle.ChangeType<BASE>();
+            obj.Vtable = new VTABLE(0x4dd200);
+            if ((free & 1) != 0)
+                Program.Free(address);
+            return address;
         }
 
-        #endregion
+        [HookFunction(FunctionNames.BASE_GetClassID, CallingConvention = CallingConvention.ThisCall)]
+        public virtual int GetClassID()
+        {
+            return classID;
+        }
+
+        [HookFunction(FunctionNames.BASE_IncreaseReferenceCounter, CallingConvention = CallingConvention.ThisCall)]
+        public virtual void IncreaseReferenceCounter()
+        {
+            NumReferences++;
+        }
+
+        [HookFunction(FunctionNames.BASE_IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.BASE__IsDerivedFrom, CallingConvention = CallingConvention.ThisCall)]
+        public virtual bool IsDerivedFrom(int classID)
+        {
+            return BASE.classID == classID;
+        }
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Open3dmm
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
     sealed class HookFunctionAttribute : Attribute
     {
         public CallingConvention CallingConvention { get; set; } = CallingConvention.StdCall;

@@ -1,14 +1,20 @@
 ﻿using Open3dmm.Classes;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Open3dmm
 {
-    public class NativeObject
+    public unsafe class NativeObject : IEquatable<NativeObject>
     {
         private NativeHandle nativeHandle;
 
         public NativeHandle NativeHandle => nativeHandle;
+
+        [NativeFieldOffset(0x0)]
+        public extern ref VTABLE Vtable { get; }
+        [NativeFieldOffset(0x4)]
+        public extern ref int NumReferences { get; }
 
         internal void SetHandle(NativeHandle nativeHandle)
         {
@@ -18,28 +24,17 @@ namespace Open3dmm
             Initialize();
         }
 
-        protected ref T GetField<T>(int offset, bool boundsChecking = true) where T : unmanaged
+        public static Pointer<T> GetGlobal<T>(int address) where T : unmanaged
         {
-            return ref new Pointer<T>(CalculateAddressOfField(offset, boundsChecking)).Value;
+            return new Pointer<T>(new IntPtr(address));
         }
 
-        protected T GetReference<T>(int offset, bool boundsChecking = true) where T : NativeObject
-        {
-            return FromPointer<T>(GetField<IntPtr>(offset, boundsChecking));
-        }
-
-        protected void SetReference<T>(T obj, int offset, bool boundsChecking = true) where T : NativeObject
-        {
-            obj.EnsureNotDisposed();
-            GetField<IntPtr>(offset, boundsChecking) = obj.NativeHandle.Address;
-        }
-
-        public static T FromPointer<T>(IntPtr ptr) where T : NativeObject
+        public static T FromPointer<T>(IntPtr ptr) where T : NativeObject, new()
         {
             if (ptr == IntPtr.Zero)
                 return default;
             if (!NativeHandle.TryDereference(ptr, out var handle))
-                throw new InvalidCastException();
+                throw new InvalidOperationException();
             return handle.QueryInterface<T>();
         }
 
@@ -60,7 +55,10 @@ namespace Open3dmm
             {
                 if (!nativeHandle.IsDisposed)
                 {
-                    classID = new ClassID((int)UnmanagedFunctionCall.ThisCall(Marshal.ReadIntPtr(Marshal.ReadIntPtr(nativeHandle.Address), 4), nativeHandle.Address));
+                    var func = Marshal.ReadIntPtr(Marshal.ReadIntPtr(nativeHandle.Address), 4);
+                    if (func.ToInt32() < NativeAbstraction.ModuleHandle.ToInt32())
+                        goto Fail;
+                    classID = new ClassID((int)UnmanagedFunctionCall.ThisCall(func, nativeHandle.Address));
                     return true;
                 }
             }
@@ -68,6 +66,7 @@ namespace Open3dmm
             {
             }
 
+        Fail:
             classID = default;
             return false;
         }
@@ -105,5 +104,35 @@ namespace Open3dmm
                 return ref *(byte*)nativeHandle.Address;
             }
         }
+
+        #region Equality Implementation
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as NativeObject);
+        }
+
+        public bool Equals(NativeObject other)
+        {
+            return other != null &&
+                   EqualityComparer<IntPtr>.Default.Equals(this.nativeHandle.Address, other.nativeHandle.Address);
+        }
+
+        public override int GetHashCode()
+        {
+            return -2057323372 + EqualityComparer<IntPtr>.Default.GetHashCode(this.nativeHandle.Address);
+        }
+
+        public static bool operator ==(NativeObject left, NativeObject right)
+        {
+            return EqualityComparer<NativeObject>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(NativeObject left, NativeObject right)
+        {
+            return !(left == right);
+        }
+
+        #endregion
     }
 }

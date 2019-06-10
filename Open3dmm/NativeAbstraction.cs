@@ -21,14 +21,12 @@ namespace Open3dmm
             ApplyPatches();
             SetWindowsApiHooks();
             SetNativeHooks();
-            InitMethods();
         }
 
         static partial void LoadImports();
         static partial void ApplyPatches();
         static partial void SetWindowsApiHooks();
         static unsafe partial void SetNativeHooks();
-        static partial void InitMethods();
         public static IntPtr AddressOfFunction(FunctionNames functionName)
         {
             return (IntPtr)functionName;

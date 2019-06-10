@@ -83,7 +83,6 @@
             this.Controls.Add(this.textBox);
             this.Name = "DebugForm";
             this.Text = "Form1";
-            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 

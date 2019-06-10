@@ -3,89 +3,72 @@ using System.Runtime.InteropServices;
 
 namespace Open3dmm.Classes
 {
-    public partial struct RECTANGLE
+    public unsafe partial struct RECTANGLE
     {
-        public int X1;
-        public int Y1;
-        public int X2;
-        public int Y2;
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
 
         public POINT TopLeft {
-            get => new POINT(X1, Y1);
+            get => new POINT(Left, Top);
         }
 
         public POINT TopRight {
-            get => new POINT(X2, Y1);
+            get => new POINT(Right, Top);
         }
 
         public POINT BottomLeft {
-            get => new POINT(X1, Y2);
+            get => new POINT(Left, Bottom);
         }
 
         public POINT BottomRight {
-            get => new POINT(X2, Y2);
+            get => new POINT(Right, Bottom);
         }
 
-        public int Width => Math.Abs(X2 - X1);
+        public int Width => Math.Abs(Right - Left);
 
-        public int Height => Math.Abs(Y2 - Y1);
+        public int Height => Math.Abs(Bottom - Top);
 
         public static readonly RECTANGLE Empty = default;
 
-        public RECTANGLE(int x1, int y1, int x2, int y2)
+        public RECTANGLE(int left, int top, int right, int bottom)
         {
-            this.X1 = x1;
-            this.Y1 = y1;
-            this.X2 = x2;
-            this.Y2 = y2;
+            this.Left = left;
+            this.Top = top;
+            this.Right = right;
+            this.Bottom = bottom;
         }
 
-        public static int MaxExtent => Marshal.ReadInt32(new IntPtr(0x4D5328));
-
-        partial void DetectRectangles();
-
-#if false
-        partial void DetectRectangles()
+        [HookFunction(FunctionNames.RECTANGLE_ToGDI, CallingConvention = CallingConvention.ThisCall)]
+        public RECTANGLE* ToGDI(RECTANGLE* dest)
         {
-            unsafe
+            GDIHelper.LimitFunction(in Left, out dest->Left);
+            GDIHelper.LimitFunction(in Top, out dest->Top);
+            GDIHelper.LimitFunction(in Right, out dest->Right);
+            GDIHelper.LimitFunction(in Bottom, out dest->Bottom);
+            return dest;
+        }
+
+        [HookFunction(FunctionNames.RECTANGLE_CalculateIntersection, CallingConvention = CallingConvention.ThisCall)]
+        public bool CalculateIntersection(RECTANGLE* other)
+        {
+            fixed (RECTANGLE* self = &this)
             {
-                fixed (void* p = &this)
-                {
-                    StructDetector.Invoke(this, new IntPtr(p));
-                }
+                return CalculateIntersection(self, other);
             }
         }
-#endif
 
-        [HookFunction(FunctionNames.Rectangle_SizeLimit, CallingConvention = CallingConvention.ThisCall)]
-        public ref RECTANGLE SizeLimit(ref RECTANGLE dest)
+        [HookFunction(FunctionNames.RECTANGLE_CalculateIntersectionBetween, CallingConvention = CallingConvention.ThisCall)]
+        public bool CalculateIntersection(RECTANGLE* a, RECTANGLE* b)
         {
-            dest.X1 = Math.Max(Math.Min(32767, X1), -MaxExtent);
-            dest.Y1 = Math.Max(Math.Min(32767, Y1), -MaxExtent);
-            dest.X2 = Math.Max(Math.Min(32767, X2), -MaxExtent);
-            dest.Y2 = Math.Max(Math.Min(32767, Y2), -MaxExtent);
-            return ref dest;
-        }
+            Left = Math.Max(a->Left, b->Left);
+            Right = Math.Min(a->Right, b->Right);
+            Top = Math.Max(a->Top, b->Top);
+            Bottom = Math.Min(a->Bottom, b->Bottom);
 
-        [HookFunction(FunctionNames.Rectangle_CalculateIntersection, CallingConvention = CallingConvention.ThisCall)]
-        public bool CalculateIntersection(in RECTANGLE other)
-        {
-            return CalculateIntersection(in this, in other);
-        }
-
-        [HookFunction(FunctionNames.Rectangle_CalculateIntersectionBetween, CallingConvention = CallingConvention.ThisCall)]
-        public bool CalculateIntersection(in RECTANGLE a, in RECTANGLE b)
-        {
-            DetectRectangles();
-            a.DetectRectangles();
-            b.DetectRectangles();
-            X1 = Math.Max(a.X1, b.X1);
-            X2 = Math.Min(a.X2, b.X2);
-            Y1 = Math.Max(a.Y1, b.Y1);
-            Y2 = Math.Min(a.Y2, b.Y2);
-
-            if (X2 >= X1
-                && Y2 >= Y1)
+            if (Right >= Left
+                && Bottom >= Top)
             {
                 return true;
             }
@@ -93,75 +76,113 @@ namespace Open3dmm.Classes
             return false;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Copy, CallingConvention = CallingConvention.ThisCall)]
-        public void Copy(in RECTANGLE source)
+        [HookFunction(FunctionNames.RECTANGLE_Copy, CallingConvention = CallingConvention.ThisCall)]
+        public void Copy(RECTANGLE* source)
         {
-            DetectRectangles();
-            source.DetectRectangles();
-            this = source;
+            this = *source;
         }
 
-        [HookFunction(FunctionNames.Rectangle_CopyAtOffset, CallingConvention = CallingConvention.ThisCall)]
-        public void Copy(in RECTANGLE source, int offsetX, int offsetY)
+        [HookFunction(FunctionNames.RECTANGLE_CopyAtOffset, CallingConvention = CallingConvention.ThisCall)]
+        public void Copy(RECTANGLE* source, int offsetX, int offsetY)
         {
-            DetectRectangles();
-            source.DetectRectangles();
-            Copy(in source);
-            Translate(offsetX, offsetY);
+            Copy(source);
+            Offset(offsetX, offsetY);
         }
 
-        [HookFunction(FunctionNames.Rectangle_HitTest, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_HitTest, CallingConvention = CallingConvention.ThisCall)]
         public bool HitTest(int x, int y)
         {
-            DetectRectangles();
-            if (X1 > x || X2 <= x)
+            if (Left > x || Right <= x)
                 return false;
-            if (Y1 > y || Y2 <= y)
+            if (Top > y || Bottom <= y)
                 return false;
             return true;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Union, CallingConvention = CallingConvention.ThisCall)]
-        public void Union(in RECTANGLE other)
+        [HookFunction(FunctionNames.RECTANGLE_Union, CallingConvention = CallingConvention.ThisCall)]
+        public void Union(RECTANGLE* other)
         {
-            DetectRectangles();
-            other.DetectRectangles();
-            if (other.X1 < other.X2 && other.Y1 < other.Y2)
+            if (other->Left < other->Right && other->Top < other->Bottom)
             {
-                if (X1 < X2 && Y1 < Y2)
+                if (Left < Right && Top < Bottom)
                 {
-                    X1 = Math.Min(X1, other.X1);
-                    Y1 = Math.Min(Y1, other.Y1);
-                    X2 = Math.Max(X2, other.X2);
-                    Y2 = Math.Max(Y2, other.Y2);
+                    Left = Math.Min(Left, other->Left);
+                    Top = Math.Min(Top, other->Top);
+                    Right = Math.Max(Right, other->Right);
+                    Bottom = Math.Max(Bottom, other->Bottom);
                 }
                 else
                 {
-                    X1 = other.X1;
-                    Y1 = other.Y1;
-                    X2 = other.X2;
-                    Y2 = other.Y2;
+                    Left = other->Left;
+                    Top = other->Top;
+                    Right = other->Right;
+                    Bottom = other->Bottom;
                 }
             }
         }
 
-        [HookFunction(FunctionNames.Rectangle_TopLeftOrigin, CallingConvention = CallingConvention.ThisCall)]
+        [HookFunction(FunctionNames.RECTANGLE_TopLeftOrigin, CallingConvention = CallingConvention.ThisCall)]
         public void TopLeftOrigin()
         {
-            DetectRectangles();
-            X2 -= X1;
-            Y2 -= Y1;
-            X1 = Y1 = 0;
+            Right -= Left;
+            Bottom -= Top;
+            Left = Top = 0;
         }
 
-        [HookFunction(FunctionNames.Rectangle_Translate, CallingConvention = CallingConvention.ThisCall)]
-        public void Translate(int distanceX, int distanceY)
+        [HookFunction(FunctionNames.RECTANGLE_Offset, CallingConvention = CallingConvention.ThisCall)]
+        public void Offset(int offsetX, int offsetY)
         {
-            DetectRectangles();
-            X1 += distanceX;
-            X2 += distanceX;
-            Y1 += distanceY;
-            Y2 += distanceY;
+            Left += offsetX;
+            Right += offsetX;
+            Top += offsetY;
+            Bottom += offsetY;
+        }
+
+        [HookFunction(FunctionNames.RECTANGLE_Transform, CallingConvention = CallingConvention.ThisCall)]
+        public void Transform(RECTANGLE* from, RECTANGLE* to)
+        {
+            int toWidth;
+            int toHeight;
+            int fromWidth;
+            int fromHeight;
+
+            toWidth = to->Right - to->Left;
+            fromWidth = from->Right - from->Left;
+            if (toWidth == fromWidth)
+            {
+                this.Left += to->Left - from->Left;
+                this.Right += to->Left - from->Left;
+            }
+            else
+            {
+                this.Left = ((this.Left - from->Left) * toWidth / fromWidth) + to->Left;
+                this.Right = to->Left + ((this.Right - from->Left) * toWidth / fromWidth);
+            }
+            toHeight = to->Bottom - to->Top;
+            fromHeight = from->Bottom - from->Top;
+            if (toHeight == fromHeight)
+            {
+                this.Top += to->Top - from->Top;
+                this.Bottom += to->Top - from->Top;
+            }
+            else
+            {
+                this.Top = ((this.Top - from->Top) * toHeight / fromHeight) + to->Top;
+                this.Bottom = to->Top + ((this.Bottom - from->Top) * toHeight / fromHeight);
+            }
+        }
+
+        [HookFunction(FunctionNames.RECTANGLE_OneValidAndBothNotSame, CallingConvention = CallingConvention.ThisCall)]
+        public bool OneValidAndBothNotSame(RECTANGLE* other)
+        {
+            if (this.Top < this.Bottom)
+            {
+                if (this.Left < this.Right)
+                {
+                    return other->Left != this.Left || other->Top != this.Top || other->Right != this.Right || other->Bottom != this.Bottom;
+                }
+            }
+            return (other->Top < other->Bottom) && other->Left < other->Right;
         }
     }
 }

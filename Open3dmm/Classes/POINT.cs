@@ -1,6 +1,9 @@
-﻿namespace Open3dmm.Classes
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace Open3dmm.Classes
 {
-    public struct POINT
+    public unsafe struct POINT
     {
         public int X;
         public int Y;
@@ -12,5 +15,14 @@
         }
 
         public static readonly POINT Zero = default;
+
+        [HookFunction(FunctionNames.POINT_ToGDI, CallingConvention = CallingConvention.ThisCall)]
+        public POINT* ToGDI(POINT* dest)
+
+        {
+            GDIHelper.LimitFunction(in X, out dest->X);
+            GDIHelper.LimitFunction(in Y, out dest->Y);
+            return dest;
+        }
     }
 }

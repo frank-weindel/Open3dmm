@@ -9,18 +9,8 @@
 
 unsigned char Reserved[4194304];
 
-void hacky_stub() {
-	auto address = (void*)0x00400000;
-	auto result = FreeLibrary((HMODULE)address);
-	auto result2 = UnmapViewOfFile(address);
-	auto newAddr = LoadLibraryA("3dmovie.exe");
-	ExitProcess(0);
-}
-
 int main()
 {
-	auto address = (void*)0x00400000;
-
 	std::vector<unsigned char> const code =
 	{
 		0x68,                   // push
@@ -76,22 +66,20 @@ int main()
 	auto const buffer = VirtualAlloc(nullptr, page_size, MEM_COMMIT, PAGE_READWRITE);
 
 	void* str_dest = (void*)((int)buffer + code.size());
-	*(int*)(code.begin()._Ptr + 6) = (int)GetProcAddress(kernel32, "FreeLibrary");
-	*(int*)(code.begin()._Ptr + 18) = (int)GetProcAddress(kernel32, "UnmapViewOfFile");
-	*(int*)(code.begin()._Ptr + 25) = (int)str_dest + 80;
-	*(int*)(code.begin()._Ptr + 30) = (int)GetProcAddress(kernel32, "LoadLibraryA");
-	*(int*)(code.begin()._Ptr + 41) = (int)str_dest + 60;
-	*(int*)(code.begin()._Ptr + 46) = (int)str_dest + 26;
-	*(int*)(code.begin()._Ptr + 51) = (int)str_dest;
-	*(int*)(code.begin()._Ptr + 72) = (int)GetProcAddress(kernel32, "ExitProcess");
+	*(void**)(code.begin()._Ptr + 6) = GetProcAddress(kernel32, "FreeLibrary");
+	*(void**)(code.begin()._Ptr + 18) = GetProcAddress(kernel32, "UnmapViewOfFile");
+	*(void**)(code.begin()._Ptr + 25) = (void*)((int)str_dest + 80);
+	*(void**)(code.begin()._Ptr + 30) = GetProcAddress(kernel32, "LoadLibraryA");
+	*(void**)(code.begin()._Ptr + 41) = (void*)((int)str_dest + 60);
+	*(void**)(code.begin()._Ptr + 46) = (void*)((int)str_dest + 26);
+	*(void**)(code.begin()._Ptr + 51) = str_dest;
+	*(void**)(code.begin()._Ptr + 72) = GetProcAddress(kernel32, "ExitProcess");
 
 	std::memcpy(str_dest, L"Open3dmm.dll\0Open3dmm.Program\0Bootstrap", 80);
 
 	//TODO: Detect 3dmm install directory
-	char path[] = "C:\\Program Files (x86)\\Microsoft Kids\\3D Movie Maker\\3dmovie.exe";
-	size_t p = sizeof(path);
-	std::memcpy((void*)((int)str_dest + 80), path, p);
-	//std::memcpy((void*)((int)str_dest + 80), "C:\\microsoft kids\\3d movie maker\\3dmovie.exe", 45);
+	std::string path = "C:\\Program Files (x86)\\Microsoft Kids\\3D Movie Maker\\3dmovie.exe";
+	std::memcpy((void*)((int)str_dest + 80), path.c_str(), path.length());
 
 	// CLR
 	ICLRMetaHost * metaHost = NULL;
