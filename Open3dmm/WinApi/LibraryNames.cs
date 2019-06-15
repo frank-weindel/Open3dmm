@@ -7,5 +7,6 @@
         public const string USER32 = "USER32.DLL";
         public const string GDI32 = "GDI32.DLL";
         public const string WIN32U = "WIN32U.DLL";
+        public const string WINMM = "WINMM.DLL";
     }
 }

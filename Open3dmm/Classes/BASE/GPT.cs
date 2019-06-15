@@ -46,6 +46,26 @@ namespace Open3dmm.Classes
         public int Width => Bounds.Right - Bounds.Left;
         public int Height => Bounds.Bottom - Bounds.Top;
 
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            Program.debugForm.BeginInvoke((Action)(() =>
+            {
+                Program.debugForm.gptList.Items.Add(this);
+            }));
+
+            this.NativeHandle.Disposed += NativeHandle_Disposed;
+        }
+
+        private void NativeHandle_Disposed()
+        {
+            Program.debugForm.BeginInvoke((Action)(() =>
+            {
+                Program.debugForm.gptList.Items.Remove(this);
+            }));
+        }
+
         [HookFunction(FunctionNames.GPT_BlitMBMP, CallingConvention = CallingConvention.ThisCall)]
         public void BlitMBMP(MBMP mbmp, RECTANGLE* dest, GNV_UnkStruct1* unkStruct)
         {

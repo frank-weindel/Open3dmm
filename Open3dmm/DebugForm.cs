@@ -18,9 +18,14 @@ namespace Open3dmm
 
     public partial class DebugForm : Form
     {
+        BufferedGraphicsContext currentContext;
+        BufferedGraphics myBuffer;
+
         public DebugForm()
         {
             InitializeComponent();
+            currentContext = BufferedGraphicsManager.Current;
+            myBuffer = currentContext.Allocate(this.pictureBox1.CreateGraphics(), this.pictureBox1.ClientRectangle);
         }
 
         public unsafe GPT AllocateGPT(RECTANGLE rect, int bitsPerPixel = 1)
@@ -52,7 +57,7 @@ namespace Open3dmm
 
         }
 
-        private void GptButton_Click(object sender, EventArgs e)
+        private void DrawSelectedGpt()
         {
             GPT selectedGPT = (GPT)this.gptList.SelectedItem;
             if (selectedGPT != null)
@@ -64,11 +69,11 @@ namespace Open3dmm
                 }
                 //IntPtr hdc = Win32.GetDCEx(this.Handle, IntPtr.Zero, Win32.DeviceContextValues.Window);
                 //IntPtr hdc = PInvoke.Call(LibraryNames.USER32, "GetDCEx", this.Handle, IntPtr.Zero, (IntPtr)Win32.DeviceContextValues.Window);
-                System.Drawing.Graphics g = System.Drawing.Graphics.FromHwnd(this.Handle);
+                System.Drawing.Graphics g = myBuffer.Graphics;
 
                 System.Drawing.Graphics gptGraphics = System.Drawing.Graphics.FromHdc(selectedGPT.DC);
 
-                gptGraphics.DrawLine(System.Drawing.Pens.Aqua, 0, 0, 100, 100);
+                //gptGraphics.DrawLine(System.Drawing.Pens.Aqua, 0, 0, 100, 100);
                 
 
                 try
@@ -83,11 +88,84 @@ namespace Open3dmm
                     g.ReleaseHdc();
                 }
 
+                this.pictureBox1.Refresh();
+
 
                 textBox.Text = "" + selectedGPT.DC.ToString("X");// + " - " + hdc.ToString("X");
+            }
+        }
+
+        private void GptButton_Click(object sender, EventArgs e)
+        {
+            DrawSelectedGpt();
+        }
+
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            DrawSelectedGpt();
+        }
+
+        private unsafe void MbmpInfo_Click(object sender, EventArgs e)
+        {
+            MBMP selectedMbmp = (MBMP)this.mbmpList.SelectedItem;
+            if (selectedMbmp != null)
+            {
+                if (selectedMbmp.NativeHandle.IsDisposed)
+                {
+                    MessageBox.Show("Handle disposed");
+                    return;
+                }
+
+
+                //IntPtr hdc = Win32.GetDCEx(this.Handle, IntPtr.Zero, Win32.DeviceContextValues.Window);
+                //IntPtr hdc = PInvoke.Call(LibraryNames.USER32, "GetDCEx", this.Handle, IntPtr.Zero, (IntPtr)Win32.DeviceContextValues.Window);
+                System.Drawing.Graphics g = myBuffer.Graphics;
+                GPT gpt = null;
+                System.Drawing.Graphics gptGraphics = null;
+                try
+                {
+                    RECTANGLE clip = default;
+                    selectedMbmp.GetRect(out clip);
+
+                    gpt = AllocateGPT(new RECTANGLE(0, 0, clip.Width, clip.Height), 8);
+                    gptGraphics = System.Drawing.Graphics.FromHdc(gpt.DC);
+                    IntPtr hdc = g.GetHdc();
+                    IntPtr gptHdc = gptGraphics.GetHdc();
+
+                    textBox.Text = "stride:" + gpt.Stride + " left: " + clip.Left + " right: " + clip.Right + " top: " + clip.Top + " bottom: " + clip.Bottom;
+                    Int32.TryParse(textBox1.Text, out int x);
+                    Int32.TryParse(textBox2.Text, out int y);
+                    selectedMbmp.Blit(gpt.PixelBuffer, gpt.Stride, gpt.Height, 0, 0, &clip, gpt.Region);
+                    Win32.BitBlt(hdc, x, y, gpt.Width, gpt.Height, gptHdc, 0, 0, Win32.TernaryRasterOperations.SRCCOPY);
+
+                }
+                finally
+                {
+                    if (gptGraphics != null)
+                    {
+                        gptGraphics.ReleaseHdc();
+                    }
+                    
+                    g.ReleaseHdc();
+                }
+                this.pictureBox1.Refresh();
+
+
 
             }
         }
+
+        private void PictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            myBuffer.Render(e.Graphics);
+        }
+
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            timer1.Enabled = checkBox1.Checked;
+        }
+
+
 
 
         //[DllImport("user32.dll")]

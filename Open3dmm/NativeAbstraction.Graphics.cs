@@ -45,10 +45,10 @@ namespace Open3dmm
             GameTimer.Updated += ProcessUI;
             GameTimer.Draw += RenderUI;
             timerThread = new Thread(() => {
-                while (true) {
-                    GameTimer.Tick();
-                    Thread.Sleep(0);
-                }
+                //while (true) {
+                //    GameTimer.Tick();
+                //    Thread.Sleep(0);
+                //}
             });
             timerThread.Start();
             

@@ -71,6 +71,8 @@ namespace Open3dmm.Classes
         protected override void Initialize()
         {
             base.Initialize();
+            Console.WriteLine("BWLD: " + this.NativeHandle.Address.ToString("X"));
+
             renderer = new BrWorldRenderer(this);
             NativeAbstraction.GameTimer.Draw += OnRender;
         }

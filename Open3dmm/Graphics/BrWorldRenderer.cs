@@ -66,8 +66,8 @@ namespace Open3dmm.Graphics
                 // TODO: Implement lights
             }
 
-            SetupLights(*node.FirstChild);
-            SetupLights(*node.Next);
+            //SetupLights(*node.FirstChild);
+            //SetupLights(*node.Next);
         }
 
         private void RenderNode(BrActor node, Matrix world)

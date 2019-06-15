@@ -94,6 +94,41 @@ namespace Open3dmm
             }, out _);
 
 
+            ApiDetour.TryHook<StdCall4>(LibraryNames.WINMM, "mciSendCommandA", originalFunction =>
+            {
+                return (a, b, c, d) =>
+                {
+                    return IntPtr.Zero;
+                };
+            }, out _);
+
+            ApiDetour.TryHook<StdCall2>(LibraryNames.WINMM, "midiOutSetVolume", originalFunction =>
+            {
+                return (a, b) =>
+                {
+                    return originalFunction(a, IntPtr.Zero);
+                };
+            }, out _);
+
+            ApiDetour.TryHook<StdCall2>(LibraryNames.WINMM, "waveOutSetVolume", originalFunction =>
+            {
+                return (a, b) =>
+                {
+                    return originalFunction(a, IntPtr.Zero);
+                };
+            }, out _);
+            
+
+
+
+            //ApiDetour.TryHook<StdCall3>(LibraryNames.WINMM, "midiStreamOut", originalFunction =>
+            //{
+            //    return (a, b, c,) =>
+            //    {
+            //        return IntPtr.Zero;
+            //    };
+            //}, out _);
+
 
 
         }
